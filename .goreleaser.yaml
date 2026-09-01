@@ -1,0 +1,72 @@
+version: 2
+
+project_name: openlane-mcp
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: openlane-mcp
+    main: ./cmd/openlane-mcp
+    binary: openlane-mcp
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm64
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
+
+archives:
+  - name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    formats: ["tar.gz"]
+    format_overrides:
+      - goos: windows
+        formats: ["zip"]
+
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
+
+sboms:
+  - artifacts: archive
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+
+dockers:
+  - id: linux-amd64
+    dockerfile: Dockerfile.release
+    image_templates:
+      - "ghcr.io/gregdog/mcp-server-theopenlane:{{ .Tag }}-amd64"
+    goos: linux
+    goarch: amd64
+  - id: linux-arm64
+    dockerfile: Dockerfile.release
+    image_templates:
+      - "ghcr.io/gregdog/mcp-server-theopenlane:{{ .Tag }}-arm64"
+    goos: linux
+    goarch: arm64
+
+docker_manifests:
+  - name_template: "ghcr.io/gregdog/mcp-server-theopenlane:{{ .Tag }}"
+    image_templates:
+      - "ghcr.io/gregdog/mcp-server-theopenlane:{{ .Tag }}-amd64"
+      - "ghcr.io/gregdog/mcp-server-theopenlane:{{ .Tag }}-arm64"
+  - name_template: "ghcr.io/gregdog/mcp-server-theopenlane:latest"
+    image_templates:
+      - "ghcr.io/gregdog/mcp-server-theopenlane:{{ .Tag }}-amd64"
+      - "ghcr.io/gregdog/mcp-server-theopenlane:{{ .Tag }}-arm64"

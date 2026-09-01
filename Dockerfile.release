@@ -1,0 +1,5 @@
+FROM gcr.io/distroless/static-debian12:nonroot
+COPY openlane-mcp /openlane-mcp
+USER nonroot:nonroot
+ENTRYPOINT ["/openlane-mcp"]
+CMD ["serve"]

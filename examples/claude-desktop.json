@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "openlane": {
+      "command": "openlane-mcp",
+      "args": ["serve"],
+      "env": {
+        "OPENLANE_API_TOKEN": "tola_example_not_a_real_token"
+      }
+    }
+  }
+}

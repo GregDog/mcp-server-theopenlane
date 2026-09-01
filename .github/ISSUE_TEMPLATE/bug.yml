@@ -1,0 +1,35 @@
+name: Bug report
+description: Report a problem with the Openlane MCP server
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Do not include Openlane tokens, PATs, or other secrets.
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: openlane-mcp version
+      placeholder: output of `openlane-mcp version`
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Paste stderr or MCP client logs with tokens redacted.
