@@ -4,6 +4,8 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-09-03
+
 ### Added
 
 - `openlane_policies_awaiting_approval` convenience tool combining native `NEEDS_APPROVAL` policies and pending workflow assignments on policies
