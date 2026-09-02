@@ -1,7 +1,7 @@
 GO ?= go
 BIN := bin/openlane-mcp
 
-.PHONY: all build test vet fmt vuln check
+.PHONY: all build test test-access vet fmt vuln check
 
 all: check build
 
@@ -11,6 +11,9 @@ build:
 
 test:
 	$(GO) test ./...
+
+test-access:
+	@bash scripts/test-access.sh
 
 vet:
 	$(GO) vet ./...
