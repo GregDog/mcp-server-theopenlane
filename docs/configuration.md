@@ -10,8 +10,14 @@ Configuration is environment-based.
 | `OPENLANE_MCP_LOG_LEVEL` | no | `info` | `debug`, `info`, `warn`, or `error` |
 | `OPENLANE_ALLOW_WRITE` | no | `false` | Enable write MCP tools when `true`, `1`, `yes`, or `on` |
 | `OPENLANE_ALLOW_DELETE` | no | `false` | Enable delete MCP tools when `true`, `1`, `yes`, or `on` |
+| `OPENLANE_MCP_TRANSPORT` | no | `stdio` | `stdio` or `http` |
+| `OPENLANE_MCP_HTTP_ADDR` | no | `:8080` | Listen address when `OPENLANE_MCP_TRANSPORT=http` |
+| `OPENLANE_MCP_HTTP_JSON` | no | `false` | Use `application/json` responses for HTTP transport |
+| `OPENLANE_MCP_HTTP_MAX_BODY_BYTES` | no | `33554432` | Max HTTP request body size (32 MiB) |
+| `OPENLANE_MCP_MAX_UPLOAD_BYTES` | no | `10485760` | Max decoded evidence upload per file (10 MiB) |
+| `OPENLANE_MCP_UPLOAD_TIMEOUT` | no | `2m` | Openlane API timeout for evidence uploads |
 
-You can also pass `--allow-write` or `--allow-delete` to `openlane-mcp serve`. Write and delete are independent; enabling writes does not enable deletes.
+You can also pass `--allow-write`, `--allow-delete`, `--transport`, `--http-addr`, or `--http-json` to `openlane-mcp serve`. Write and delete are independent; enabling writes does not enable deletes.
 
 Create tokens in the Openlane console under developer settings. The token value is shown once.
 

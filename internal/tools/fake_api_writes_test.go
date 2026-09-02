@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/theopenlane/go-client/graphclient"
 )
 
@@ -13,10 +14,10 @@ func (f *fakeAPI) CreateControl(context.Context, graphclient.CreateControlInput)
 func (f *fakeAPI) UpdateControl(context.Context, string, graphclient.UpdateControlInput) (*graphclient.UpdateControl, error) {
 	return nil, errors.New("unused")
 }
-func (f *fakeAPI) CreateEvidence(context.Context, graphclient.CreateEvidenceInput) (*graphclient.CreateEvidence, error) {
+func (f *fakeAPI) CreateEvidence(context.Context, graphclient.CreateEvidenceInput, []*graphql.Upload) (*graphclient.CreateEvidence, error) {
 	return nil, errors.New("unused")
 }
-func (f *fakeAPI) UpdateEvidence(context.Context, string, graphclient.UpdateEvidenceInput) (*graphclient.UpdateEvidence, error) {
+func (f *fakeAPI) UpdateEvidence(context.Context, string, graphclient.UpdateEvidenceInput, []*graphql.Upload) (*graphclient.UpdateEvidence, error) {
 	return nil, errors.New("unused")
 }
 func (f *fakeAPI) CreateInternalPolicy(context.Context, graphclient.CreateInternalPolicyInput) (*graphclient.CreateInternalPolicy, error) {

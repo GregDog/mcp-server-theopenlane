@@ -11,6 +11,7 @@ import (
 type fakeAPI struct {
 	controls *graphclient.GetControls
 	control  *graphclient.GetControlByID
+	tasks    *graphclient.GetTasks
 	err      error
 }
 
@@ -57,6 +58,13 @@ func (f *fakeAPI) GetStandards(context.Context, *int64, *string, *graphclient.St
 }
 func (f *fakeAPI) GetStandardByID(context.Context, string) (*graphclient.GetStandardByID, error) {
 	return nil, errors.New("unused")
+}
+
+func (f *fakeAPI) GetTasks(ctx context.Context, first *int64, after *string, where *graphclient.TaskWhereInput) (*graphclient.GetTasks, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	return f.tasks, nil
 }
 
 func TestListControls(t *testing.T) {

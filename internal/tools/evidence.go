@@ -23,6 +23,7 @@ type evidenceItem struct {
 	Description  string               `json:"description,omitempty"`
 	RenewalDate  string               `json:"renewal_date,omitempty"`
 	IsAutomated  *bool                `json:"is_automated,omitempty"`
+	FileIDs      []string             `json:"file_ids,omitempty"`
 	Controls     []evidenceControlRef `json:"controls,omitempty"`
 }
 
@@ -87,6 +88,13 @@ func (h *handlers) getEvidence(ctx context.Context, _ *mcp.CallToolRequest, in g
 		}
 		controls = append(controls, evidenceControlRef{ID: edge.Node.ID, RefCode: edge.Node.RefCode})
 	}
+	fileIDs := make([]string, 0, len(e.Files.Edges))
+	for _, edge := range e.Files.Edges {
+		if edge == nil || edge.Node == nil || edge.Node.ID == "" {
+			continue
+		}
+		fileIDs = append(fileIDs, edge.Node.ID)
+	}
 	return nil, evidenceItem{
 		ID:           e.ID,
 		DisplayID:    e.DisplayID,
@@ -97,6 +105,7 @@ func (h *handlers) getEvidence(ctx context.Context, _ *mcp.CallToolRequest, in g
 		Description:  openlane.Deref(e.Description),
 		RenewalDate:  openlane.Format(e.RenewalDate),
 		IsAutomated:  e.IsAutomated,
+		FileIDs:      fileIDs,
 		Controls:     controls,
 	}, nil
 }

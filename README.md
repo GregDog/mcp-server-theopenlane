@@ -11,11 +11,11 @@ This project is **not** an official Openlane product and is not endorsed by theo
 
 ## Overview
 
-`openlane-mcp` lets MCP clients such as Cursor and Claude Desktop query Openlane over stdio. It talks to Openlane Cloud or a self-hosted instance through the [official Openlane Go client](https://github.com/theopenlane/go-client).
+`openlane-mcp` lets MCP clients such as Cursor and Claude Desktop query Openlane over **stdio** (default) or **Streamable HTTP**. It talks to Openlane Cloud or a self-hosted instance through the [official Openlane Go client](https://github.com/theopenlane/go-client).
 
 ```text
 MCP Client
-    → Openlane MCP Server (stdio)
+    → Openlane MCP Server (stdio or HTTP)
         → Official Openlane Go Client
             → Openlane API
 ```
@@ -24,13 +24,14 @@ The server is read-only by default. Write and delete tools are opt-in and indepe
 
 ## Features
 
-- Openlane MCP access for programs, controls, evidence, policies, risks, and standards
-- Opt-in create/update tools for controls, evidence metadata, policies, risks, and tasks
+- Openlane MCP access for programs, controls, evidence, policies, risks, standards, tasks, entities (vendors), assets, and contacts
+- Opt-in create/update tools for controls, evidence, policies, risks, and tasks
 - Opt-in delete tools for the same domains (except programs and standards)
 - Openlane Cloud and self-hosted Openlane (configurable base URL)
-- stdio transport
+- stdio transport (default) and opt-in Streamable HTTP transport
 - Native Go binary
 - Docker image (published with GitHub Releases)
+- MCP Registry listing on tagged releases (`io.github.GregDog/mcp-server-theopenlane`)
 
 ## Quick Start
 
@@ -73,9 +74,22 @@ Images are published with GitHub Releases to `ghcr.io/gregdog/mcp-server-theopen
 
 ## Client configuration
 
-### Cursor
+### Cursor (stdio, recommended)
 
-Add to `~/.cursor/mcp.json` or `.cursor/mcp.json`:
+This repository's `.cursor/mcp.json` uses `scripts/mcp-serve.sh`, which loads `.env` and runs the local binary:
+
+```json
+{
+  "mcpServers": {
+    "openlane": {
+      "command": "bash",
+      "args": ["${workspaceFolder}/scripts/mcp-serve.sh"]
+    }
+  }
+}
+```
+
+Or install globally and pass env vars directly:
 
 ```json
 {
@@ -91,6 +105,10 @@ Add to `~/.cursor/mcp.json` or `.cursor/mcp.json`:
   }
 }
 ```
+
+### Cursor (HTTP)
+
+Start the server with `bash scripts/mcp-http.sh` (see [HTTP transport](#http-transport)), then use `examples/cursor-http.mcp.json` as a template.
 
 ### Claude Desktop
 
@@ -142,13 +160,21 @@ Tokens are never logged. See [docs/security.md](docs/security.md).
 | `openlane_risk_get` | Get a risk by ID |
 | `openlane_standards_list` | List standards / frameworks |
 | `openlane_standard_get` | Get a standard by ID |
+| `openlane_tasks_list` | List tasks |
+| `openlane_task_get` | Get a task by ID |
+| `openlane_entities_list` | List entities (vendors and third parties) |
+| `openlane_entity_get` | Get an entity by ID |
+| `openlane_assets_list` | List assets |
+| `openlane_asset_get` | Get an asset by ID |
+| `openlane_contacts_list` | List contacts |
+| `openlane_contact_get` | Get a contact by ID |
 
 Write tools (require `OPENLANE_ALLOW_WRITE=true` or `--allow-write`):
 
 | Tool | Description |
 | --- | --- |
 | `openlane_control_create` / `openlane_control_update` | Create or update a control |
-| `openlane_evidence_create` / `openlane_evidence_update` | Create or update evidence metadata (no file upload) |
+| `openlane_evidence_create` / `openlane_evidence_update` | Create or update evidence; optional base64 file uploads |
 | `openlane_policy_create` / `openlane_policy_update` | Create or update an internal policy |
 | `openlane_risk_create` / `openlane_risk_update` | Create or update a risk |
 | `openlane_task_create` / `openlane_task_update` | Create or update a task |
@@ -163,13 +189,29 @@ Delete tools (require `OPENLANE_ALLOW_DELETE=true` or `--allow-delete`):
 | `openlane_risk_delete` | Delete a risk by ID |
 | `openlane_task_delete` | Delete a task by ID |
 
-See [docs/tools.md](docs/tools.md) for full details.
+See [docs/tools.md](docs/tools.md) for full details. With all modes enabled there are **37 tools** (21 read, 10 write, 5 delete).
 
 List responses are paginated (`items`, `next_cursor`, `has_more`, `total_count`). Default page size is 20; maximum is 50.
 
 There is no dedicated control search GraphQL operation in the current Openlane Go client. `openlane_controls_search` uses official `ControlWhereInput` contains-filters.
 
-File contents and presigned download URLs are not returned.
+File contents and presigned download URLs are not returned from read tools. Write tools accept optional base64-encoded `files[]` on evidence create/update (default max 10 MiB decoded per file).
+
+## HTTP transport
+
+By default the server uses stdio. For remote hosting:
+
+```bash
+export OPENLANE_MCP_TRANSPORT=http
+export OPENLANE_MCP_HTTP_ADDR=:8090
+openlane-mcp serve
+```
+
+See `examples/cursor-http.mcp.json`. HTTP mode exposes the MCP endpoint without built-in authentication. Run it on a trusted network or behind your own auth proxy. Increase `OPENLANE_MCP_HTTP_MAX_BODY_BYTES` when uploading large evidence files over HTTP.
+
+## MCP Registry
+
+Published to the [MCP Registry](https://registry.modelcontextprotocol.io/) as `io.github.GregDog/mcp-server-theopenlane` on each tagged release. The OCI package is `ghcr.io/gregdog/mcp-server-theopenlane`.
 
 ## Development
 

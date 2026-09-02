@@ -23,10 +23,13 @@ Organization API tokens are scoped as `object:action`, for example `control:read
 
 ## Request bounds
 
-- HTTP timeout: 30 seconds
+- HTTP timeout: 30 seconds (2 minutes for evidence uploads)
 - Default page size: 20
 - Maximum page size: 50
+- Default evidence upload size: 10 MiB decoded per file
 - No automatic retries
+
+HTTP transport has no MCP-layer authentication. Do not expose it publicly without a proxy.
 
 ## Reporting vulnerabilities
 

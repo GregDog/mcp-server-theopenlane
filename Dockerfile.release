@@ -1,4 +1,5 @@
 FROM gcr.io/distroless/static-debian12:nonroot
+LABEL io.modelcontextprotocol.server.name="io.github.GregDog/mcp-server-theopenlane"
 COPY openlane-mcp /openlane-mcp
 USER nonroot:nonroot
 ENTRYPOINT ["/openlane-mcp"]

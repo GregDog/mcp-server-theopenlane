@@ -50,7 +50,7 @@ Search matches ref code, title, or description (`ContainsFold`). The current cli
 | `openlane_evidence_list` | `GetEvidences` |
 | `openlane_evidence_get` | `GetEvidenceByID` |
 
-File contents and presigned URLs are omitted.
+List responses omit file contents. Get responses include `file_ids` but not presigned URLs.
 
 ## Policies
 
@@ -75,16 +75,46 @@ MCP names use “policy”; the Openlane type is `InternalPolicy`.
 | `openlane_standards_list` | `GetStandards` |
 | `openlane_standard_get` | `GetStandardByID` |
 
+## Tasks
+
+| Tool | Openlane client |
+| --- | --- |
+| `openlane_tasks_list` | `GetTasks` |
+| `openlane_task_get` | `GetTaskByID` |
+
+## Entities
+
+| Tool | Openlane client |
+| --- | --- |
+| `openlane_entities_list` | `GetEntities` |
+| `openlane_entity_get` | `GetEntityByID` |
+
+Entities represent vendors and other third parties in Openlane. There is no separate vendor API in the current Go client.
+
+## Assets
+
+| Tool | Openlane client |
+| --- | --- |
+| `openlane_assets_list` | `GetAssets` |
+| `openlane_asset_get` | `GetAssetByID` |
+
+## Contacts
+
+| Tool | Openlane client |
+| --- | --- |
+| `openlane_contacts_list` | `GetContacts` |
+| `openlane_contact_get` | `GetContactByID` |
+
 ## Write tools (opt-in)
 
-Enabled with `OPENLANE_ALLOW_WRITE=true` or `openlane-mcp serve --allow-write`. Evidence writes are metadata only; file uploads are not supported.
+Enabled with `OPENLANE_ALLOW_WRITE=true` or `openlane-mcp serve --allow-write`.
 
 | Tool | Openlane client |
 | --- | --- |
 | `openlane_control_create` | `CreateControl` |
 | `openlane_control_update` | `UpdateControl` |
-| `openlane_evidence_create` | `CreateEvidence` (no files) |
-| `openlane_evidence_update` | `UpdateEvidence` (no files) |
+| `openlane_evidence_create` | `CreateEvidence` (optional `files[]` base64 uploads) |
+| `openlane_evidence_update` | `UpdateEvidence` (optional `files[]` base64 uploads) |
 | `openlane_policy_create` | `CreateInternalPolicy` |
 | `openlane_policy_update` | `UpdateInternalPolicy` |
 | `openlane_risk_create` | `CreateRisk` |
@@ -93,6 +123,8 @@ Enabled with `OPENLANE_ALLOW_WRITE=true` or `openlane-mcp serve --allow-write`. 
 | `openlane_task_update` | `UpdateTask` |
 
 Create tools require the Openlane mandatory fields (`ref_code` for controls, `name` for evidence/policies/risks, `title` for tasks). Update tools require `id` and at least one field to change.
+
+Evidence file uploads use `files[]` objects with `filename`, optional `content_type`, and `content_base64`. Default max decoded size is 10 MiB per file (`OPENLANE_MCP_MAX_UPLOAD_BYTES`). Presigned download URLs are still omitted from read responses.
 
 ## Delete tools (opt-in)
 

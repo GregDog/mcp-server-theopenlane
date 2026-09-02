@@ -5,13 +5,17 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/99designs/gqlgen/graphql"
 	gqlclient "github.com/theopenlane/go-client"
 	"github.com/theopenlane/go-client/graphclient"
 
 	"github.com/GregDog/mcp-server-theopenlane/internal/config"
 )
 
-const httpTimeout = 30 * time.Second
+const (
+	httpTimeout       = 30 * time.Second
+	uploadHTTPTimeout = 2 * time.Minute
+)
 
 // GraphAPI is the subset of the official Openlane client used by MCP tools.
 type GraphAPI interface {
@@ -27,10 +31,18 @@ type GraphAPI interface {
 	GetRiskByID(ctx context.Context, id string) (*graphclient.GetRiskByID, error)
 	GetStandards(ctx context.Context, first *int64, after *string, where *graphclient.StandardWhereInput) (*graphclient.GetStandards, error)
 	GetStandardByID(ctx context.Context, id string) (*graphclient.GetStandardByID, error)
+	GetTasks(ctx context.Context, first *int64, after *string, where *graphclient.TaskWhereInput) (*graphclient.GetTasks, error)
+	GetTaskByID(ctx context.Context, id string) (*graphclient.GetTaskByID, error)
+	GetEntities(ctx context.Context, first *int64, after *string, where *graphclient.EntityWhereInput) (*graphclient.GetEntities, error)
+	GetEntityByID(ctx context.Context, id string) (*graphclient.GetEntityByID, error)
+	GetAssets(ctx context.Context, first *int64, after *string, where *graphclient.AssetWhereInput) (*graphclient.GetAssets, error)
+	GetAssetByID(ctx context.Context, id string) (*graphclient.GetAssetByID, error)
+	GetContacts(ctx context.Context, first *int64, after *string, where *graphclient.ContactWhereInput) (*graphclient.GetContacts, error)
+	GetContactByID(ctx context.Context, id string) (*graphclient.GetContactByID, error)
 	CreateControl(ctx context.Context, input graphclient.CreateControlInput) (*graphclient.CreateControl, error)
 	UpdateControl(ctx context.Context, id string, input graphclient.UpdateControlInput) (*graphclient.UpdateControl, error)
-	CreateEvidence(ctx context.Context, input graphclient.CreateEvidenceInput) (*graphclient.CreateEvidence, error)
-	UpdateEvidence(ctx context.Context, id string, input graphclient.UpdateEvidenceInput) (*graphclient.UpdateEvidence, error)
+	CreateEvidence(ctx context.Context, input graphclient.CreateEvidenceInput, evidenceFiles []*graphql.Upload) (*graphclient.CreateEvidence, error)
+	UpdateEvidence(ctx context.Context, id string, input graphclient.UpdateEvidenceInput, evidenceFiles []*graphql.Upload) (*graphclient.UpdateEvidence, error)
 	CreateInternalPolicy(ctx context.Context, input graphclient.CreateInternalPolicyInput) (*graphclient.CreateInternalPolicy, error)
 	UpdateInternalPolicy(ctx context.Context, id string, input graphclient.UpdateInternalPolicyInput) (*graphclient.UpdateInternalPolicy, error)
 	CreateRisk(ctx context.Context, input graphclient.CreateRiskInput) (*graphclient.CreateRisk, error)
@@ -58,16 +70,21 @@ func New(cfg config.Config) (GraphAPI, error) {
 	if err != nil {
 		return nil, fmt.Errorf("create openlane client: %w", RedactError(err))
 	}
+	timeout := httpTimeout
+	if cfg.UploadTimeout > 0 {
+		timeout = cfg.UploadTimeout
+	}
 	if req := c.HTTPSlingRequester(); req != nil {
 		if hc := req.HTTPClient(); hc != nil {
-			hc.Timeout = httpTimeout
+			hc.Timeout = timeout
 		}
 	}
-	return &api{c: c}, nil
+	return &api{c: c, uploadTimeout: timeout}, nil
 }
 
 type api struct {
-	c *gqlclient.Client
+	c             *gqlclient.Client
+	uploadTimeout time.Duration
 }
 
 func (a *api) GetControls(ctx context.Context, first *int64, after *string, where *graphclient.ControlWhereInput) (*graphclient.GetControls, error) {
@@ -118,6 +135,38 @@ func (a *api) GetStandardByID(ctx context.Context, id string) (*graphclient.GetS
 	return a.c.GetStandardByID(ctx, id)
 }
 
+func (a *api) GetTasks(ctx context.Context, first *int64, after *string, where *graphclient.TaskWhereInput) (*graphclient.GetTasks, error) {
+	return a.c.GetTasks(ctx, first, nil, after, nil, where, nil)
+}
+
+func (a *api) GetTaskByID(ctx context.Context, id string) (*graphclient.GetTaskByID, error) {
+	return a.c.GetTaskByID(ctx, id)
+}
+
+func (a *api) GetEntities(ctx context.Context, first *int64, after *string, where *graphclient.EntityWhereInput) (*graphclient.GetEntities, error) {
+	return a.c.GetEntities(ctx, first, nil, after, nil, where, nil)
+}
+
+func (a *api) GetEntityByID(ctx context.Context, id string) (*graphclient.GetEntityByID, error) {
+	return a.c.GetEntityByID(ctx, id)
+}
+
+func (a *api) GetAssets(ctx context.Context, first *int64, after *string, where *graphclient.AssetWhereInput) (*graphclient.GetAssets, error) {
+	return a.c.GetAssets(ctx, first, nil, after, nil, where, nil)
+}
+
+func (a *api) GetAssetByID(ctx context.Context, id string) (*graphclient.GetAssetByID, error) {
+	return a.c.GetAssetByID(ctx, id)
+}
+
+func (a *api) GetContacts(ctx context.Context, first *int64, after *string, where *graphclient.ContactWhereInput) (*graphclient.GetContacts, error) {
+	return a.c.GetContacts(ctx, first, nil, after, nil, where, nil)
+}
+
+func (a *api) GetContactByID(ctx context.Context, id string) (*graphclient.GetContactByID, error) {
+	return a.c.GetContactByID(ctx, id)
+}
+
 func (a *api) CreateControl(ctx context.Context, input graphclient.CreateControlInput) (*graphclient.CreateControl, error) {
 	return a.c.CreateControl(ctx, input)
 }
@@ -126,12 +175,25 @@ func (a *api) UpdateControl(ctx context.Context, id string, input graphclient.Up
 	return a.c.UpdateControl(ctx, id, input)
 }
 
-func (a *api) CreateEvidence(ctx context.Context, input graphclient.CreateEvidenceInput) (*graphclient.CreateEvidence, error) {
-	return a.c.CreateEvidence(ctx, input, nil)
+func (a *api) CreateEvidence(ctx context.Context, input graphclient.CreateEvidenceInput, evidenceFiles []*graphql.Upload) (*graphclient.CreateEvidence, error) {
+	return a.withUploadTimeout(ctx, len(evidenceFiles) > 0, func(ctx context.Context) (*graphclient.CreateEvidence, error) {
+		return a.c.CreateEvidence(ctx, input, evidenceFiles)
+	})
 }
 
-func (a *api) UpdateEvidence(ctx context.Context, id string, input graphclient.UpdateEvidenceInput) (*graphclient.UpdateEvidence, error) {
-	return a.c.UpdateEvidence(ctx, id, input, nil)
+func (a *api) UpdateEvidence(ctx context.Context, id string, input graphclient.UpdateEvidenceInput, evidenceFiles []*graphql.Upload) (*graphclient.UpdateEvidence, error) {
+	return a.withUploadTimeout(ctx, len(evidenceFiles) > 0, func(ctx context.Context) (*graphclient.UpdateEvidence, error) {
+		return a.c.UpdateEvidence(ctx, id, input, evidenceFiles)
+	})
+}
+
+func (a *api) withUploadTimeout[T any](ctx context.Context, uploading bool, fn func(context.Context) (T, error)) (T, error) {
+	if !uploading || a.uploadTimeout <= httpTimeout {
+		return fn(ctx)
+	}
+	uploadCtx, cancel := context.WithTimeout(ctx, a.uploadTimeout)
+	defer cancel()
+	return fn(uploadCtx)
 }
 
 func (a *api) CreateInternalPolicy(ctx context.Context, input graphclient.CreateInternalPolicyInput) (*graphclient.CreateInternalPolicy, error) {

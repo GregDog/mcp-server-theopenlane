@@ -1,0 +1,54 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.GregDog/mcp-server-theopenlane",
+  "title": "Openlane MCP Server",
+  "description": "MCP server for the Openlane GRC platform: controls, evidence, policies, risks, tasks, entities, assets, contacts, and more.",
+  "version": "0.3.0",
+  "repository": {
+    "url": "https://github.com/GregDog/mcp-server-theopenlane",
+    "source": "github"
+  },
+  "websiteUrl": "https://github.com/GregDog/mcp-server-theopenlane",
+  "packages": [
+    {
+      "registryType": "oci",
+      "identifier": "ghcr.io/gregdog/mcp-server-theopenlane:0.3.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "packageArguments": [
+        {
+          "type": "positional",
+          "value": "serve"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "name": "OPENLANE_API_TOKEN",
+          "description": "Openlane API token or PAT",
+          "isRequired": true,
+          "isSecret": true
+        },
+        {
+          "name": "OPENLANE_ORGANIZATION_ID",
+          "description": "Organization ID for multi-org PATs"
+        },
+        {
+          "name": "OPENLANE_BASE_URL",
+          "description": "Openlane API base URL",
+          "default": "https://api.theopenlane.io"
+        },
+        {
+          "name": "OPENLANE_ALLOW_WRITE",
+          "description": "Enable write MCP tools",
+          "default": "false"
+        },
+        {
+          "name": "OPENLANE_ALLOW_DELETE",
+          "description": "Enable delete MCP tools",
+          "default": "false"
+        }
+      ]
+    }
+  ]
+}
