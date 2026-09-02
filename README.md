@@ -199,15 +199,19 @@ File contents and presigned download URLs are not returned from read tools. Writ
 
 ## HTTP transport
 
-By default the server uses stdio. For remote hosting:
+By default the server uses stdio. For local HTTP testing:
 
 ```bash
 export OPENLANE_MCP_TRANSPORT=http
-export OPENLANE_MCP_HTTP_ADDR=:8090
+export OPENLANE_MCP_HTTP_ADDR=127.0.0.1:8090
 openlane-mcp serve
 ```
 
-See `examples/cursor-http.mcp.json`. HTTP mode exposes the MCP endpoint without built-in authentication. Run it on a trusted network or behind your own auth proxy. Increase `OPENLANE_MCP_HTTP_MAX_BODY_BYTES` when uploading large evidence files over HTTP.
+The default bind is **loopback only** (`127.0.0.1:8090`). Do not use `0.0.0.0` or bare `:port` addresses unless you understand the exposure.
+
+**HTTP mode has no built-in authentication.** Do not expose it directly to the public internet. Anyone who can reach the endpoint can use the server's Openlane token. For remote or shared-network deployment, place a trusted authentication reverse proxy (or equivalent private network controls) in front of the server. See [docs/security.md](docs/security.md).
+
+Increase `OPENLANE_MCP_HTTP_MAX_BODY_BYTES` when uploading large evidence files over HTTP.
 
 ## MCP Registry
 

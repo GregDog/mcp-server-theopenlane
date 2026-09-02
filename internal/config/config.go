@@ -12,7 +12,7 @@ const (
 	DefaultBaseURL       = "https://api.theopenlane.io"
 	DefaultLogLevel      = "info"
 	DefaultTransport     = "stdio"
-	DefaultHTTPAddr      = ":8080"
+	DefaultHTTPAddr      = "127.0.0.1:8090"
 	DefaultHTTPMaxBody   = 32 * 1024 * 1024 // 32 MiB
 	DefaultMaxUpload     = 10 * 1024 * 1024 // 10 MiB
 	DefaultUploadTimeout = 2 * time.Minute

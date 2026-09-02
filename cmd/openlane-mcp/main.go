@@ -62,7 +62,7 @@ func setupLogger(level string) {
 	default:
 		lvl = slog.LevelInfo
 	}
-	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: lvl})))
+	slog.SetDefault(slog.New(openlane.NewRedactingHandler(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: lvl}))))
 }
 
 type serveFlags struct {
@@ -171,7 +171,7 @@ Environment:
   OPENLANE_ALLOW_WRITE            Enable write MCP tools when true (default false)
   OPENLANE_ALLOW_DELETE           Enable delete MCP tools when true (default false)
   OPENLANE_MCP_TRANSPORT          stdio or http (default stdio)
-  OPENLANE_MCP_HTTP_ADDR          HTTP listen address when transport=http (default :8080)
+  OPENLANE_MCP_HTTP_ADDR          HTTP listen address when transport=http (default 127.0.0.1:8090, loopback only)
   OPENLANE_MCP_HTTP_JSON          Use application/json responses for HTTP transport
   OPENLANE_MCP_HTTP_MAX_BODY_BYTES  Max HTTP request body size (default 33554432)
   OPENLANE_MCP_MAX_UPLOAD_BYTES   Max decoded evidence upload size (default 10485760)

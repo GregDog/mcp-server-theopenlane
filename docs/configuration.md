@@ -11,7 +11,7 @@ Configuration is environment-based.
 | `OPENLANE_ALLOW_WRITE` | no | `false` | Enable write MCP tools when `true`, `1`, `yes`, or `on` |
 | `OPENLANE_ALLOW_DELETE` | no | `false` | Enable delete MCP tools when `true`, `1`, `yes`, or `on` |
 | `OPENLANE_MCP_TRANSPORT` | no | `stdio` | `stdio` or `http` |
-| `OPENLANE_MCP_HTTP_ADDR` | no | `:8080` | Listen address when `OPENLANE_MCP_TRANSPORT=http` |
+| `OPENLANE_MCP_HTTP_ADDR` | no | `127.0.0.1:8090` | Loopback listen address when `OPENLANE_MCP_TRANSPORT=http` |
 | `OPENLANE_MCP_HTTP_JSON` | no | `false` | Use `application/json` responses for HTTP transport |
 | `OPENLANE_MCP_HTTP_MAX_BODY_BYTES` | no | `33554432` | Max HTTP request body size (32 MiB) |
 | `OPENLANE_MCP_MAX_UPLOAD_BYTES` | no | `10485760` | Max decoded evidence upload per file (10 MiB) |

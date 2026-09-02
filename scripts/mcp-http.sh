@@ -22,7 +22,7 @@ source "$ENV_FILE"
 set +a
 
 export OPENLANE_MCP_TRANSPORT=http
-export OPENLANE_MCP_HTTP_ADDR="${OPENLANE_MCP_HTTP_ADDR:-:8090}"
+export OPENLANE_MCP_HTTP_ADDR="${OPENLANE_MCP_HTTP_ADDR:-127.0.0.1:8090}"
 
 if [[ -z "${OPENLANE_API_TOKEN:-}" ]]; then
 	echo "error: OPENLANE_API_TOKEN is empty in $ENV_FILE" >&2

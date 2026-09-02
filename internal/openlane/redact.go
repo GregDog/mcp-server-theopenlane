@@ -6,23 +6,40 @@ import (
 )
 
 var tokenPattern = regexp.MustCompile(`(?i)\b(tola_|tolp_)[A-Za-z0-9_\-\.]+`)
+var authHeaderPattern = regexp.MustCompile(`(?i)(authorization\s*[:=]\s*)(\S+)`)
+var bearerPattern = regexp.MustCompile(`(?i)\bBearer\s+\S+`)
+var contentBase64Pattern = regexp.MustCompile(`(?i)"content_base64"\s*:\s*"[^"]*"`)
 
 // Redact removes Openlane API tokens and PATs from a string.
 func Redact(s string) string {
 	if s == "" {
 		return s
 	}
-	return tokenPattern.ReplaceAllStringFunc(s, func(match string) string {
-		lower := strings.ToLower(match)
-		switch {
-		case strings.HasPrefix(lower, "tola_"):
-			return "tola_[redacted]"
-		case strings.HasPrefix(lower, "tolp_"):
-			return "tolp_[redacted]"
-		default:
-			return "[redacted]"
-		}
-	})
+	out := tokenPattern.ReplaceAllStringFunc(s, redactTokenMatch)
+	out = authHeaderPattern.ReplaceAllString(out, `${1}[redacted]`)
+	out = bearerPattern.ReplaceAllString(out, "Bearer [redacted]")
+	return out
+}
+
+// RedactLogMessage redacts tokens, auth headers, and base64 upload payloads from log text.
+func RedactLogMessage(s string) string {
+	if s == "" {
+		return s
+	}
+	out := Redact(s)
+	return contentBase64Pattern.ReplaceAllString(out, `"content_base64":"[redacted]"`)
+}
+
+func redactTokenMatch(match string) string {
+	lower := strings.ToLower(match)
+	switch {
+	case strings.HasPrefix(lower, "tola_"):
+		return "tola_[redacted]"
+	case strings.HasPrefix(lower, "tolp_"):
+		return "tolp_[redacted]"
+	default:
+		return "[redacted]"
+	}
 }
 
 // RedactError returns err with token values removed from the message.

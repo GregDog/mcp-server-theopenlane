@@ -63,7 +63,7 @@ For Streamable HTTP instead of stdio:
 
 ```bash
 OPENLANE_MCP_TRANSPORT=http
-OPENLANE_MCP_HTTP_ADDR=:8090   # use a free port if 8080 is taken
+OPENLANE_MCP_HTTP_ADDR=127.0.0.1:8090   # loopback only; do not use 0.0.0.0 without a trusted auth proxy
 ```
 
 2. Start the server in a separate terminal:
@@ -84,7 +84,7 @@ bash scripts/mcp-http.sh
 }
 ```
 
-HTTP mode has no built-in MCP authentication. Use only on a trusted network or behind your own proxy.
+HTTP mode has no built-in MCP authentication. Do not expose it directly to the public internet. Use a trusted reverse proxy for remote deployment. See [security.md](security.md).
 
 ## Evidence upload testing
 

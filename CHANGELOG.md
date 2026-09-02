@@ -15,6 +15,10 @@ All notable changes to this project are documented in this file.
 - `scripts/mcp-http.sh` and `examples/cursor-http.mcp.json` for HTTP transport testing
 - `docs/publishing.md` for maintainer registry steps
 
+### Changed
+
+- HTTP transport defaults to loopback-only bind (`127.0.0.1:8090`); server timeouts, request size limits, log redaction for auth headers and upload payloads; startup warning when binding to a non-loopback address
+
 ### Fixed
 
 - `openlane-mcp serve` no longer overrides `OPENLANE_MCP_TRANSPORT` and `OPENLANE_MCP_HTTP_ADDR` from the environment when CLI flags are omitted

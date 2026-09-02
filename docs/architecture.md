@@ -20,7 +20,7 @@ internal/tools          MCP tool handlers (read / write / delete)
 
 Evidence file uploads decode base64 MCP payloads and pass `graphql.Upload` values to `CreateEvidence` / `UpdateEvidence`. There is no separate upload API.
 
-There is no built-in MCP authentication in HTTP mode. The Openlane API token is process-wide configuration.
+There is no built-in MCP authentication in HTTP mode. The Openlane API token is process-wide configuration. Remote deployment requires a trusted external authentication reverse-proxy layer.
 
 ## Security model
 
