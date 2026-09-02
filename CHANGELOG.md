@@ -4,6 +4,12 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-09-03
+
+### Fixed
+
+- Use `v`-prefixed OCI image tags in MCP Registry manifest sync (GoReleaser publishes `v0.5.x`, not `0.5.x`)
+
 ## [0.5.1] - 2026-09-03
 
 ### Fixed

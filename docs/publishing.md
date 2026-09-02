@@ -11,7 +11,7 @@ Tagged releases publish:
 Manifest: [`server.json`](../server.json)
 
 - **Name:** `io.github.GregDog/mcp-server-theopenlane`
-- **Package:** OCI image `ghcr.io/gregdog/mcp-server-theopenlane:<version>`
+- **Package:** OCI image `ghcr.io/gregdog/mcp-server-theopenlane:v<version>` (GoReleaser uses the git tag, including the `v` prefix)
 - **Ownership:** Docker label `io.modelcontextprotocol.server.name` in `Dockerfile.release`
 
 The release workflow syncs `server.json` version and image tag from the git tag, then runs:

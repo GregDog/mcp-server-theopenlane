@@ -3,7 +3,7 @@
   "name": "io.github.GregDog/mcp-server-theopenlane",
   "title": "Openlane MCP Server",
   "description": "MCP server for Openlane GRC: controls, evidence, policies, risks, workflows, and approvals.",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "repository": {
     "url": "https://github.com/GregDog/mcp-server-theopenlane",
     "source": "github"
@@ -12,7 +12,7 @@
   "packages": [
     {
       "registryType": "oci",
-      "identifier": "ghcr.io/gregdog/mcp-server-theopenlane:0.5.1",
+      "identifier": "ghcr.io/gregdog/mcp-server-theopenlane:v0.5.2",
       "transport": {
         "type": "stdio"
       },
