@@ -4,6 +4,12 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-09-03
+
+### Fixed
+
+- Shorten `server.json` description to satisfy MCP Registry 100-character limit (v0.5.0 registry publish failed)
+
 ## [0.5.0] - 2026-09-03
 
 ### Added
