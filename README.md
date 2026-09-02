@@ -20,7 +20,7 @@ MCP Client
             → Openlane API
 ```
 
-The server is read-only. It never exposes GraphQL mutations. Openlane authorization still applies to every request.
+The server is read-only by default. Write tools are opt-in. Openlane authorization still applies to every request.
 
 ## Features
 
@@ -113,7 +113,7 @@ Prefer environment substitution or a local secrets store over committing tokens.
 
 ## Security
 
-v0.1 tools are read-only. Write and delete operations are not implemented.
+Read tools are always available. Write tools require `OPENLANE_ALLOW_WRITE=true` or `--allow-write`. Delete tools require `OPENLANE_ALLOW_DELETE=true` or `--allow-delete`.
 
 A successful read still requires:
 

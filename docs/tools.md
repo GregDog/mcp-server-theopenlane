@@ -1,6 +1,8 @@
 # Tools
 
-All tools are read-only. Arguments are validated by the MCP Go SDK from Go structs.
+Read tools are always registered. Write and delete tools are registered only when their mode is enabled.
+
+Arguments are validated by the MCP Go SDK from Go structs.
 
 List and search tools accept:
 
@@ -72,5 +74,38 @@ MCP names use “policy”; the Openlane type is `InternalPolicy`.
 | --- | --- |
 | `openlane_standards_list` | `GetStandards` |
 | `openlane_standard_get` | `GetStandardByID` |
+
+## Write tools (opt-in)
+
+Enabled with `OPENLANE_ALLOW_WRITE=true` or `openlane-mcp serve --allow-write`. Evidence writes are metadata only; file uploads are not supported.
+
+| Tool | Openlane client |
+| --- | --- |
+| `openlane_control_create` | `CreateControl` |
+| `openlane_control_update` | `UpdateControl` |
+| `openlane_evidence_create` | `CreateEvidence` (no files) |
+| `openlane_evidence_update` | `UpdateEvidence` (no files) |
+| `openlane_policy_create` | `CreateInternalPolicy` |
+| `openlane_policy_update` | `UpdateInternalPolicy` |
+| `openlane_risk_create` | `CreateRisk` |
+| `openlane_risk_update` | `UpdateRisk` |
+| `openlane_task_create` | `CreateTask` |
+| `openlane_task_update` | `UpdateTask` |
+
+Create tools require the Openlane mandatory fields (`ref_code` for controls, `name` for evidence/policies/risks, `title` for tasks). Update tools require `id` and at least one field to change.
+
+## Delete tools (opt-in)
+
+Enabled with `OPENLANE_ALLOW_DELETE=true` or `openlane-mcp serve --allow-delete`. Independent of write mode.
+
+| Tool | Openlane client |
+| --- | --- |
+| `openlane_control_delete` | `DeleteControl` |
+| `openlane_evidence_delete` | `DeleteEvidence` |
+| `openlane_policy_delete` | `DeleteInternalPolicy` |
+| `openlane_risk_delete` | `DeleteRisk` |
+| `openlane_task_delete` | `DeleteTask` |
+
+Delete tools require `id` and return `deleted_id`.
 
 Verified against `github.com/theopenlane/go-client` v0.14.0, the latest stable release at implementation time.

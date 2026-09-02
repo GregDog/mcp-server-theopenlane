@@ -27,6 +27,21 @@ type GraphAPI interface {
 	GetRiskByID(ctx context.Context, id string) (*graphclient.GetRiskByID, error)
 	GetStandards(ctx context.Context, first *int64, after *string, where *graphclient.StandardWhereInput) (*graphclient.GetStandards, error)
 	GetStandardByID(ctx context.Context, id string) (*graphclient.GetStandardByID, error)
+	CreateControl(ctx context.Context, input graphclient.CreateControlInput) (*graphclient.CreateControl, error)
+	UpdateControl(ctx context.Context, id string, input graphclient.UpdateControlInput) (*graphclient.UpdateControl, error)
+	CreateEvidence(ctx context.Context, input graphclient.CreateEvidenceInput) (*graphclient.CreateEvidence, error)
+	UpdateEvidence(ctx context.Context, id string, input graphclient.UpdateEvidenceInput) (*graphclient.UpdateEvidence, error)
+	CreateInternalPolicy(ctx context.Context, input graphclient.CreateInternalPolicyInput) (*graphclient.CreateInternalPolicy, error)
+	UpdateInternalPolicy(ctx context.Context, id string, input graphclient.UpdateInternalPolicyInput) (*graphclient.UpdateInternalPolicy, error)
+	CreateRisk(ctx context.Context, input graphclient.CreateRiskInput) (*graphclient.CreateRisk, error)
+	UpdateRisk(ctx context.Context, id string, input graphclient.UpdateRiskInput) (*graphclient.UpdateRisk, error)
+	CreateTask(ctx context.Context, input graphclient.CreateTaskInput) (*graphclient.CreateTask, error)
+	UpdateTask(ctx context.Context, id string, input graphclient.UpdateTaskInput) (*graphclient.UpdateTask, error)
+	DeleteControl(ctx context.Context, id string) (string, error)
+	DeleteEvidence(ctx context.Context, id string) (string, error)
+	DeleteInternalPolicy(ctx context.Context, id string) (string, error)
+	DeleteRisk(ctx context.Context, id string) (string, error)
+	DeleteTask(ctx context.Context, id string) (string, error)
 }
 
 // New constructs the official Openlane client. It does not call the API.
@@ -101,4 +116,84 @@ func (a *api) GetStandards(ctx context.Context, first *int64, after *string, whe
 
 func (a *api) GetStandardByID(ctx context.Context, id string) (*graphclient.GetStandardByID, error) {
 	return a.c.GetStandardByID(ctx, id)
+}
+
+func (a *api) CreateControl(ctx context.Context, input graphclient.CreateControlInput) (*graphclient.CreateControl, error) {
+	return a.c.CreateControl(ctx, input)
+}
+
+func (a *api) UpdateControl(ctx context.Context, id string, input graphclient.UpdateControlInput) (*graphclient.UpdateControl, error) {
+	return a.c.UpdateControl(ctx, id, input)
+}
+
+func (a *api) CreateEvidence(ctx context.Context, input graphclient.CreateEvidenceInput) (*graphclient.CreateEvidence, error) {
+	return a.c.CreateEvidence(ctx, input, nil)
+}
+
+func (a *api) UpdateEvidence(ctx context.Context, id string, input graphclient.UpdateEvidenceInput) (*graphclient.UpdateEvidence, error) {
+	return a.c.UpdateEvidence(ctx, id, input, nil)
+}
+
+func (a *api) CreateInternalPolicy(ctx context.Context, input graphclient.CreateInternalPolicyInput) (*graphclient.CreateInternalPolicy, error) {
+	return a.c.CreateInternalPolicy(ctx, input)
+}
+
+func (a *api) UpdateInternalPolicy(ctx context.Context, id string, input graphclient.UpdateInternalPolicyInput) (*graphclient.UpdateInternalPolicy, error) {
+	return a.c.UpdateInternalPolicy(ctx, id, input)
+}
+
+func (a *api) CreateRisk(ctx context.Context, input graphclient.CreateRiskInput) (*graphclient.CreateRisk, error) {
+	return a.c.CreateRisk(ctx, input)
+}
+
+func (a *api) UpdateRisk(ctx context.Context, id string, input graphclient.UpdateRiskInput) (*graphclient.UpdateRisk, error) {
+	return a.c.UpdateRisk(ctx, id, input)
+}
+
+func (a *api) CreateTask(ctx context.Context, input graphclient.CreateTaskInput) (*graphclient.CreateTask, error) {
+	return a.c.CreateTask(ctx, input)
+}
+
+func (a *api) UpdateTask(ctx context.Context, id string, input graphclient.UpdateTaskInput) (*graphclient.UpdateTask, error) {
+	return a.c.UpdateTask(ctx, id, input)
+}
+
+func (a *api) DeleteControl(ctx context.Context, id string) (string, error) {
+	resp, err := a.c.DeleteControl(ctx, id)
+	if err != nil {
+		return "", err
+	}
+	return resp.DeleteControl.DeletedID, nil
+}
+
+func (a *api) DeleteEvidence(ctx context.Context, id string) (string, error) {
+	resp, err := a.c.DeleteEvidence(ctx, id)
+	if err != nil {
+		return "", err
+	}
+	return resp.DeleteEvidence.DeletedID, nil
+}
+
+func (a *api) DeleteInternalPolicy(ctx context.Context, id string) (string, error) {
+	resp, err := a.c.DeleteInternalPolicy(ctx, id)
+	if err != nil {
+		return "", err
+	}
+	return resp.DeleteInternalPolicy.DeletedID, nil
+}
+
+func (a *api) DeleteRisk(ctx context.Context, id string) (string, error) {
+	resp, err := a.c.DeleteRisk(ctx, id)
+	if err != nil {
+		return "", err
+	}
+	return resp.DeleteRisk.DeletedID, nil
+}
+
+func (a *api) DeleteTask(ctx context.Context, id string) (string, error) {
+	resp, err := a.c.DeleteTask(ctx, id)
+	if err != nil {
+		return "", err
+	}
+	return resp.DeleteTask.DeletedID, nil
 }

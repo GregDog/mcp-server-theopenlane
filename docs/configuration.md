@@ -8,6 +8,10 @@ Configuration is environment-based.
 | `OPENLANE_BASE_URL` | no | `https://api.theopenlane.io` | API base URL for Cloud or self-hosted Openlane |
 | `OPENLANE_ORGANIZATION_ID` | no | | Organization ID for multi-org PATs |
 | `OPENLANE_MCP_LOG_LEVEL` | no | `info` | `debug`, `info`, `warn`, or `error` |
+| `OPENLANE_ALLOW_WRITE` | no | `false` | Enable write MCP tools when `true`, `1`, `yes`, or `on` |
+| `OPENLANE_ALLOW_DELETE` | no | `false` | Enable delete MCP tools when `true`, `1`, `yes`, or `on` |
+
+You can also pass `--allow-write` or `--allow-delete` to `openlane-mcp serve`. Write and delete are independent; enabling writes does not enable deletes.
 
 Create tokens in the Openlane console under developer settings. The token value is shown once.
 

@@ -1,15 +1,15 @@
 # Security
 
-v0.1 is read-only. There are no write or delete MCP tools, and no `--allow-write` / `--allow-delete` flags.
+Read tools are always available. Write tools are opt-in via `OPENLANE_ALLOW_WRITE` or `--allow-write`. Delete tools are opt-in via `OPENLANE_ALLOW_DELETE` or `--allow-delete`. Enabling writes does not enable deletes.
 
 A call succeeds only if:
 
 ```text
-the MCP tool exists and is read-only
+the MCP tool is enabled by server configuration (for writes/deletes)
         AND
 the Openlane token is valid and permitted for that object
         AND
-Openlane authorization allows the read
+Openlane authorization allows the operation
 ```
 
 Organization API tokens are scoped as `object:action`, for example `control:read`. PATs inherit the creating user's permissions. Grant the minimum scopes needed.
