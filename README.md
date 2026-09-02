@@ -20,13 +20,14 @@ MCP Client
             → Openlane API
 ```
 
-The server is read-only by default. Write tools are opt-in. Openlane authorization still applies to every request.
+The server is read-only by default. Write and delete tools are opt-in and independent. Openlane authorization still applies to every request.
 
 ## Features
 
 - Openlane MCP access for programs, controls, evidence, policies, risks, and standards
+- Opt-in create/update tools for controls, evidence metadata, policies, risks, and tasks
+- Opt-in delete tools for the same domains (except programs and standards)
 - Openlane Cloud and self-hosted Openlane (configurable base URL)
-- Read-only tools
 - stdio transport
 - Native Go binary
 - Docker image (published with GitHub Releases)
@@ -120,6 +121,8 @@ A successful read still requires:
 1. An Openlane token with the relevant `object:read` scope (or equivalent PAT permissions)
 2. Openlane authorization for that object in the selected organization
 
+Writes and deletes additionally require server opt-in (`OPENLANE_ALLOW_WRITE` / `OPENLANE_ALLOW_DELETE`) and matching Openlane token permissions.
+
 Tokens are never logged. See [docs/security.md](docs/security.md).
 
 ## Tool coverage
@@ -139,6 +142,28 @@ Tokens are never logged. See [docs/security.md](docs/security.md).
 | `openlane_risk_get` | Get a risk by ID |
 | `openlane_standards_list` | List standards / frameworks |
 | `openlane_standard_get` | Get a standard by ID |
+
+Write tools (require `OPENLANE_ALLOW_WRITE=true` or `--allow-write`):
+
+| Tool | Description |
+| --- | --- |
+| `openlane_control_create` / `openlane_control_update` | Create or update a control |
+| `openlane_evidence_create` / `openlane_evidence_update` | Create or update evidence metadata (no file upload) |
+| `openlane_policy_create` / `openlane_policy_update` | Create or update an internal policy |
+| `openlane_risk_create` / `openlane_risk_update` | Create or update a risk |
+| `openlane_task_create` / `openlane_task_update` | Create or update a task |
+
+Delete tools (require `OPENLANE_ALLOW_DELETE=true` or `--allow-delete`):
+
+| Tool | Description |
+| --- | --- |
+| `openlane_control_delete` | Delete a control by ID |
+| `openlane_evidence_delete` | Delete evidence by ID |
+| `openlane_policy_delete` | Delete a policy by ID |
+| `openlane_risk_delete` | Delete a risk by ID |
+| `openlane_task_delete` | Delete a task by ID |
+
+See [docs/tools.md](docs/tools.md) for full details.
 
 List responses are paginated (`items`, `next_cursor`, `has_more`, `total_count`). Default page size is 20; maximum is 50.
 

@@ -23,11 +23,13 @@ There is no Streamable HTTP transport in this release.
 ## Security model
 
 ```text
-MCP tools are read-only
+read tools are always available
+        AND
+write/delete tools only when explicitly enabled
         AND
 Openlane token permissions
         AND
 Openlane authorization
 ```
 
-This server does not bypass Openlane privacy rules or FGA checks. A token that cannot read a control will not see it here either.
+This server does not bypass Openlane privacy rules or FGA checks. A token that cannot read a control will not see it here either. Write and delete operations require both server opt-in and matching Openlane permissions.
