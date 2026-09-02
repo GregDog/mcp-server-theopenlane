@@ -73,6 +73,11 @@ type evidenceListInput struct {
 	ControlID string `json:"control_id,omitempty" jsonschema:"Filter evidence linked to this control ID."`
 }
 
+type policyListInput struct {
+	listInput
+	Status string `json:"status,omitempty" jsonschema:"Filter by document status: DRAFT, NEEDS_APPROVAL, APPROVED, PUBLISHED, or ARCHIVED."`
+}
+
 func readOnly() *mcp.ToolAnnotations {
 	destructive := false
 	openWorld := true

@@ -51,6 +51,13 @@ Example prompts:
 
 - "List the first 5 Openlane controls"
 - "List entities with high risk rating that do not enforce MFA"
+- "List policies awaiting approval" (`openlane_policies_awaiting_approval`)
+- "List policies in NEEDS_APPROVAL" (`openlane_policies_list` with `status`)
+- "Approve this policy" (native InternalPolicy in NEEDS_APPROVAL; requires write mode and confirm)
+- "Approve this workflow assignment" (requires a real WorkflowAssignment; write mode and confirm)
+- "Submit this policy for approval"
+- "List my pending workflow assignments"
+- "What fields can be approval-gated on policies?" (`openlane_workflow_metadata_get`)
 - "Get program `<id>` — what evidence, findings, and tasks are linked?"
 - "List open high-severity findings for program `<id>`"
 - "Get entity `<id>` — SOC 2, SSO/MFA, contract dates, and owner"
@@ -68,7 +75,20 @@ After `make build` and configuring `.env`, exercise the enriched read tools:
 4. **Control implementation** — `openlane_control_implementations_list` with `{"control_id":"<id>"}` then `openlane_control_implementation_get`.
 5. **Assessment** — `openlane_assessments_list` then `openlane_assessment_get` for campaigns, responses, and findings.
 
-In Cursor, reload MCP after rebuilding. Use **Output → MCP Logs** if a tool fails. Compare results with the Openlane UI for the same object IDs.
+## Workflow and policy approval manual testing
+
+After `make build` and configuring `.env` (enable write mode for lifecycle/assignment actions):
+
+1. **Policies awaiting approval** — `openlane_policies_awaiting_approval` with `{"limit":50}`. Confirm `path` is `native` or `workflow` and the summary counts match.
+2. **Native policy filter** — `openlane_policies_list` with `{"status":"NEEDS_APPROVAL"}`.
+3. **Workflow instances by type** — `openlane_workflow_instances_list` with `{"object_type":"InternalPolicy","state":"PAUSED"}` (no `object_id` required).
+4. **My assignments** — `openlane_workflow_assignments_list` with `{"status":"PENDING"}`.
+5. **Metadata** — `openlane_workflow_metadata_get` with `{"schema_type":"InternalPolicy"}` before authoring workflows.
+6. **Native lifecycle** (write mode, `confirm: true`) — `openlane_policy_submit_for_approval`, `openlane_policy_approve`, `openlane_policy_return_to_draft`, `openlane_policy_publish` on a test policy.
+7. **Workflow assignment** (write mode, `confirm: true`) — only when a real assignment exists: `openlane_workflow_assignment_approve` or `openlane_workflow_assignment_reject` with `reason`.
+8. **Group/user lookup** — `openlane_groups_list` / `openlane_users_list` with name filters before `openlane_workflow_assignment_reassign`.
+
+In Cursor, reload MCP after rebuilding (`make build`, then **Developer: Reload Window** or restart the `openlane` server under **Settings → MCP**). Use **Output → MCP Logs** if a tool fails. Compare results with the Openlane UI for the same object IDs.
 
 ## HTTP transport testing
 
@@ -121,10 +141,10 @@ MCP read tools return `file_ids` but not presigned download URLs. Verify downloa
 
 | Mode | Count |
 | --- | --- |
-| Read (always on) | 27 |
-| Write (opt-in) | 10 |
-| Delete (opt-in) | 5 |
-| **Total** | **42** |
+| Read (always on) | 40 |
+| Write (opt-in) | 20 |
+| Delete (opt-in) | 6 |
+| **Total** | **66** |
 
 See [tools.md](tools.md) for the full mapping to Openlane client methods.
 

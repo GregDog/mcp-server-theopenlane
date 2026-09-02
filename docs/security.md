@@ -2,6 +2,8 @@
 
 Read tools are always available. Write tools are opt-in via `OPENLANE_ALLOW_WRITE` or `--allow-write`. Delete tools are opt-in via `OPENLANE_ALLOW_DELETE` or `--allow-delete`. Enabling writes does not enable deletes.
 
+Workflow definition writes, workflow assignment actions, native InternalPolicy lifecycle actions, and workflow definition deletes also require `confirm: true`. Omitting it returns a preview and does not mutate.
+
 A call succeeds only if:
 
 ```text

@@ -22,12 +22,21 @@ func Register(server *mcp.Server, api openlane.GraphAPI, opts Options) {
 	registerImplementations(server, h)
 	registerAssessments(server, h)
 	registerFindings(server, h)
+	registerWorkflows(server, h)
+	registerWorkflowInstances(server, h)
+	registerWorkflowAssignments(server, h)
+	registerWorkflowMetadata(server, h)
+	registerGroups(server, h)
+	registerUsers(server, h)
 	if opts.AllowWrite {
 		registerWriteControls(server, h)
 		registerWriteEvidence(server, h)
 		registerWritePolicies(server, h)
 		registerWriteRisks(server, h)
 		registerWriteTasks(server, h)
+		registerWriteWorkflows(server, h)
+		registerWriteWorkflowAssignments(server, h)
+		registerPolicyLifecycle(server, h)
 	}
 	if opts.AllowDelete {
 		registerDeletes(server, h)

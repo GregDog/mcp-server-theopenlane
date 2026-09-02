@@ -23,7 +23,7 @@ func registerPolicies(server *mcp.Server, h *handlers) {
 	addTool(server, &mcp.Tool{
 		Name:        "openlane_policies_list",
 		Title:       "List Openlane policies",
-		Description: "List internal policies in the configured Openlane organization. Results are paginated.",
+		Description: "List internal policies in the configured Openlane organization. Optional status filter. For policies awaiting approval across native and workflow paths, use openlane_policies_awaiting_approval. Results are paginated.",
 		Annotations: readOnly(),
 	}, h.listPolicies)
 
@@ -33,11 +33,13 @@ func registerPolicies(server *mcp.Server, h *handlers) {
 		Description: "Get a single internal policy by ID.",
 		Annotations: readOnly(),
 	}, h.getPolicy)
+
+	registerPoliciesAwaitingApproval(server, h)
 }
 
-func (h *handlers) listPolicies(ctx context.Context, _ *mcp.CallToolRequest, in listInput) (*mcp.CallToolResult, openlane.Page[policyItem], error) {
+func (h *handlers) listPolicies(ctx context.Context, _ *mcp.CallToolRequest, in policyListInput) (*mcp.CallToolResult, openlane.Page[policyItem], error) {
 	first, after := pageArgs(in.Limit, in.Cursor)
-	resp, err := h.api.GetInternalPolicies(ctx, &first, after, nil)
+	resp, err := h.api.GetInternalPolicies(ctx, &first, after, buildPolicyWhere(in))
 	if err != nil {
 		return nil, openlane.Page[policyItem]{}, openlane.APIError(err)
 	}

@@ -6,6 +6,19 @@ import (
 	"github.com/theopenlane/go-client/graphclient"
 )
 
+func TestBuildPolicyWhere(t *testing.T) {
+	where := buildPolicyWhere(policyListInput{Status: "NEEDS_APPROVAL"})
+	if where == nil {
+		t.Fatal("expected where input")
+	}
+	if where.Status == nil || string(*where.Status) != "NEEDS_APPROVAL" {
+		t.Fatalf("status filter: %+v", where.Status)
+	}
+	if buildPolicyWhere(policyListInput{}) != nil {
+		t.Fatal("expected nil where for empty status")
+	}
+}
+
 func TestBuildFindingWhere(t *testing.T) {
 	open := true
 	where := buildFindingWhere(findingListInput{

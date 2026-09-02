@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/theopenlane/go-client/graphclient"
+
+	"github.com/GregDog/mcp-server-theopenlane/internal/openlane"
 )
 
 type fakeAPI struct {
@@ -13,6 +15,17 @@ type fakeAPI struct {
 	control  *graphclient.GetControlByID
 	tasks    *graphclient.GetTasks
 	err      error
+
+	policy     *graphclient.GetInternalPolicyByID
+	groups     *graphclient.GetGroups
+	group      *graphclient.GetGroupByID
+	users      *graphclient.GetUsers
+	user       *graphclient.GetUserByID
+	workflow   *graphclient.GetWorkflowDefinitionByID
+	createdWF  *graphclient.CreateWorkflowDefinition
+	metadata   *openlane.WorkflowMetadata
+	assignment *openlane.WorkflowAssignmentDetail
+	deletedID  string
 }
 
 func (f *fakeAPI) GetControls(ctx context.Context, first *int64, after *string, where *graphclient.ControlWhereInput) (*graphclient.GetControls, error) {
@@ -44,7 +57,13 @@ func (f *fakeAPI) GetEvidenceByID(context.Context, string) (*graphclient.GetEvid
 func (f *fakeAPI) GetInternalPolicies(context.Context, *int64, *string, *graphclient.InternalPolicyWhereInput) (*graphclient.GetInternalPolicies, error) {
 	return nil, errors.New("unused")
 }
-func (f *fakeAPI) GetInternalPolicyByID(context.Context, string) (*graphclient.GetInternalPolicyByID, error) {
+func (f *fakeAPI) GetInternalPolicyByID(_ context.Context, id string) (*graphclient.GetInternalPolicyByID, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	if f.policy != nil {
+		return f.policy, nil
+	}
 	return nil, errors.New("unused")
 }
 func (f *fakeAPI) GetRisks(context.Context, *int64, *string, *graphclient.RiskWhereInput) (*graphclient.GetRisks, error) {

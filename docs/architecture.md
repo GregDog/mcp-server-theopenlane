@@ -22,6 +22,8 @@ Evidence file uploads decode base64 MCP payloads and pass `graphql.Upload` value
 
 Enriched get tools issue one primary `Get*ByID` call plus bounded parallel list queries for relationship summaries (up to eight items per relation). There is no built-in compliance scoring or gap analysis.
 
+Workflow read tools use the official Go client where possible. Custom GraphQL supplements go-client v0.14.0 gaps (`workflowMetadata`, assignment `dueAt`/targets, instance `proposalPreview`, and assignment request-changes/reassign mutations). Workflow definition writes validate `definition_json` against live `workflowMetadata` and a copied core JSON schema.
+
 There is no built-in MCP authentication in HTTP mode. The Openlane API token is process-wide configuration. Remote deployment requires a trusted external authentication reverse-proxy layer.
 
 ## Security model

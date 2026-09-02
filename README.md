@@ -24,11 +24,11 @@ The server is read-only by default. Write and delete tools are opt-in and indepe
 
 ## Features
 
-- Openlane MCP access for programs, controls, evidence, policies, risks, standards, tasks, entities (vendors), assets, contacts, findings, assessments, and control implementations
+- Openlane MCP access for programs, controls, evidence, policies, risks, standards, tasks, entities (vendors), assets, contacts, findings, assessments, control implementations, groups, users, and workflows
 - Enriched get tools with vendor/security fields and compact relationship summaries
-- List filters on entities, risks, findings, evidence, programs, assessments, and implementations
-- Opt-in create/update tools for controls, evidence, policies, risks, and tasks
-- Opt-in delete tools for the same domains (except programs and standards)
+- List filters on entities, risks, findings, evidence, programs, assessments, implementations, and workflows
+- Opt-in create/update tools for controls, evidence, policies, risks, tasks, workflow definitions, workflow assignments, and native policy lifecycle
+- Opt-in delete tools for the same domains plus workflow definitions (except programs and standards)
 - Openlane Cloud and self-hosted Openlane (configurable base URL)
 - stdio transport (default) and opt-in Streamable HTTP transport
 - Native Go binary
@@ -141,7 +141,7 @@ A successful read still requires:
 1. An Openlane token with the relevant `object:read` scope (or equivalent PAT permissions)
 2. Openlane authorization for that object in the selected organization
 
-Writes and deletes additionally require server opt-in (`OPENLANE_ALLOW_WRITE` / `OPENLANE_ALLOW_DELETE`) and matching Openlane token permissions.
+Writes and deletes additionally require server opt-in (`OPENLANE_ALLOW_WRITE` / `OPENLANE_ALLOW_DELETE`) and matching Openlane token permissions. Workflow definition writes, workflow assignment actions, native policy lifecycle actions, and workflow deletes also require `confirm: true` on the tool call.
 
 Tokens are never logged. See [docs/security.md](docs/security.md).
 
@@ -156,7 +156,8 @@ Tokens are never logged. See [docs/security.md](docs/security.md).
 | `openlane_program_get` | Get a program by ID (with relationship summaries) |
 | `openlane_evidence_list` | List evidence metadata (optional program/control filters) |
 | `openlane_evidence_get` | Get evidence metadata by ID |
-| `openlane_policies_list` | List internal policies |
+| `openlane_policies_list` | List internal policies (optional status filter) |
+| `openlane_policies_awaiting_approval` | List policies awaiting approval (native NEEDS_APPROVAL + your pending workflow assignments) |
 | `openlane_policy_get` | Get a policy by ID |
 | `openlane_risks_list` | List risks (optional program/entity/control/status filters) |
 | `openlane_risk_get` | Get a risk by ID (with relationship summaries) |
@@ -176,6 +177,18 @@ Tokens are never logged. See [docs/security.md](docs/security.md).
 | `openlane_asset_get` | Get an asset by ID |
 | `openlane_contacts_list` | List contacts |
 | `openlane_contact_get` | Get a contact by ID |
+| `openlane_groups_list` | List groups (optional name filter) |
+| `openlane_group_get` | Get a group by ID |
+| `openlane_users_list` | List users (optional name/email filters) |
+| `openlane_user_get` | Get a user by ID |
+| `openlane_workflows_list` | List workflow definitions (optional schema/kind/active filters) |
+| `openlane_workflows_search` | Search workflow definitions by name or description |
+| `openlane_workflow_get` | Get a workflow definition by ID (with plain-English summary) |
+| `openlane_workflow_instances_list` | List workflow instances (optional definition/state/object filters) |
+| `openlane_workflow_instance_get` | Get a workflow instance by ID (assignments, events, proposal preview) |
+| `openlane_workflow_assignments_list` | List my workflow approval assignments |
+| `openlane_workflow_assignment_get` | Get a workflow assignment by ID (targets, due date, object context) |
+| `openlane_workflow_metadata_get` | Get workflow-eligible fields, edges, and resolver keys per object type |
 
 Write tools (require `OPENLANE_ALLOW_WRITE=true` or `--allow-write`):
 
@@ -184,8 +197,12 @@ Write tools (require `OPENLANE_ALLOW_WRITE=true` or `--allow-write`):
 | `openlane_control_create` / `openlane_control_update` | Create or update a control |
 | `openlane_evidence_create` / `openlane_evidence_update` | Create or update evidence; optional base64 file uploads |
 | `openlane_policy_create` / `openlane_policy_update` | Create or update an internal policy |
+| `openlane_policy_submit_for_approval` / `openlane_policy_approve` / `openlane_policy_publish` / `openlane_policy_return_to_draft` | Native InternalPolicy status transitions (`confirm` required) |
 | `openlane_risk_create` / `openlane_risk_update` | Create or update a risk |
 | `openlane_task_create` / `openlane_task_update` | Create or update a task |
+| `openlane_workflow_create` / `openlane_workflow_update` | Create or update a WorkflowDefinition (`confirm` required) |
+| `openlane_workflow_assignment_approve` / `openlane_workflow_assignment_reject` | Approve or reject a WorkflowAssignment (`confirm` required) |
+| `openlane_workflow_assignment_request_changes` / `openlane_workflow_assignment_reassign` | Request changes or reassign an assignment (`confirm` required) |
 
 Delete tools (require `OPENLANE_ALLOW_DELETE=true` or `--allow-delete`):
 
@@ -196,8 +213,9 @@ Delete tools (require `OPENLANE_ALLOW_DELETE=true` or `--allow-delete`):
 | `openlane_policy_delete` | Delete a policy by ID |
 | `openlane_risk_delete` | Delete a risk by ID |
 | `openlane_task_delete` | Delete a task by ID |
+| `openlane_workflow_delete` | Delete a workflow definition by ID (`confirm` required) |
 
-See [docs/tools.md](docs/tools.md) for full details. With all modes enabled there are **42 tools** (27 read, 10 write, 5 delete).
+See [docs/tools.md](docs/tools.md) for full details. With all modes enabled there are **66 tools** (40 read, 20 write, 6 delete).
 
 Enriched get tools return bounded relationship summaries (`count` + `items`) so agents can answer program, vendor, control, and finding questions without chaining dozens of shallow calls.
 

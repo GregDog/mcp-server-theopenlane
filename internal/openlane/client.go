@@ -47,6 +47,28 @@ type GraphAPI interface {
 	GetFindings(ctx context.Context, first *int64, after *string, where *graphclient.FindingWhereInput) (*graphclient.GetFindings, error)
 	GetFindingByID(ctx context.Context, id string) (*graphclient.GetFindingByID, error)
 	GetRemediations(ctx context.Context, first *int64, after *string, where *graphclient.RemediationWhereInput) (*graphclient.GetRemediations, error)
+	GetWorkflowDefinitions(ctx context.Context, first *int64, after *string, where *graphclient.WorkflowDefinitionWhereInput) (*graphclient.GetWorkflowDefinitions, error)
+	GetWorkflowDefinitionByID(ctx context.Context, id string) (*graphclient.GetWorkflowDefinitionByID, error)
+	GetWorkflowInstances(ctx context.Context, first *int64, after *string, where *graphclient.WorkflowInstanceWhereInput) (*graphclient.GetWorkflowInstances, error)
+	GetWorkflowInstanceByID(ctx context.Context, id string) (*graphclient.GetWorkflowInstanceByID, error)
+	GetWorkflowEvents(ctx context.Context, first *int64, after *string, where *graphclient.WorkflowEventWhereInput) (*graphclient.GetWorkflowEvents, error)
+	GetMyWorkflowAssignments(ctx context.Context, first *int64, after *string, where *graphclient.WorkflowAssignmentWhereInput) (*graphclient.GetMyWorkflowAssignments, error)
+	GetWorkflowAssignments(ctx context.Context, first *int64, after *string, where *graphclient.WorkflowAssignmentWhereInput) (*graphclient.GetWorkflowAssignments, error)
+	GetWorkflowAssignmentByID(ctx context.Context, id string) (*graphclient.GetWorkflowAssignmentByID, error)
+	GetWorkflowMetadata(ctx context.Context) (*WorkflowMetadata, error)
+	GetWorkflowAssignmentDetail(ctx context.Context, id string) (*WorkflowAssignmentDetail, error)
+	GetWorkflowInstanceDetail(ctx context.Context, id string) (*WorkflowInstanceDetail, error)
+	GetGroups(ctx context.Context, first *int64, after *string, where *graphclient.GroupWhereInput) (*graphclient.GetGroups, error)
+	GetGroupByID(ctx context.Context, id string) (*graphclient.GetGroupByID, error)
+	GetUsers(ctx context.Context, first *int64, after *string, where *graphclient.UserWhereInput) (*graphclient.GetUsers, error)
+	GetUserByID(ctx context.Context, id string) (*graphclient.GetUserByID, error)
+	CreateWorkflowDefinition(ctx context.Context, input graphclient.CreateWorkflowDefinitionInput) (*graphclient.CreateWorkflowDefinition, error)
+	UpdateWorkflowDefinition(ctx context.Context, id string, input graphclient.UpdateWorkflowDefinitionInput) (*graphclient.UpdateWorkflowDefinition, error)
+	DeleteWorkflowDefinition(ctx context.Context, id string) (string, error)
+	ApproveWorkflowAssignment(ctx context.Context, id string) (*graphclient.ApproveWorkflowAssignment, error)
+	RejectWorkflowAssignment(ctx context.Context, id string, reason *string) (*graphclient.RejectWorkflowAssignment, error)
+	RequestChangesWorkflowAssignment(ctx context.Context, id string, reason *string, inputs map[string]any) error
+	ReassignWorkflowAssignment(ctx context.Context, id, targetUserID string) (string, error)
 	CreateControl(ctx context.Context, input graphclient.CreateControlInput) (*graphclient.CreateControl, error)
 	UpdateControl(ctx context.Context, id string, input graphclient.UpdateControlInput) (*graphclient.UpdateControl, error)
 	CreateEvidence(ctx context.Context, input graphclient.CreateEvidenceInput, evidenceFiles []*graphql.Upload) (*graphclient.CreateEvidence, error)
@@ -205,6 +227,78 @@ func (a *api) GetFindingByID(ctx context.Context, id string) (*graphclient.GetFi
 
 func (a *api) GetRemediations(ctx context.Context, first *int64, after *string, where *graphclient.RemediationWhereInput) (*graphclient.GetRemediations, error) {
 	return a.c.GetRemediations(ctx, first, nil, after, nil, where, nil)
+}
+
+func (a *api) GetWorkflowDefinitions(ctx context.Context, first *int64, after *string, where *graphclient.WorkflowDefinitionWhereInput) (*graphclient.GetWorkflowDefinitions, error) {
+	return a.c.GetWorkflowDefinitions(ctx, first, nil, after, nil, where, nil)
+}
+
+func (a *api) GetWorkflowDefinitionByID(ctx context.Context, id string) (*graphclient.GetWorkflowDefinitionByID, error) {
+	return a.c.GetWorkflowDefinitionByID(ctx, id)
+}
+
+func (a *api) GetWorkflowInstances(ctx context.Context, first *int64, after *string, where *graphclient.WorkflowInstanceWhereInput) (*graphclient.GetWorkflowInstances, error) {
+	return a.c.GetWorkflowInstances(ctx, first, nil, after, nil, where, nil)
+}
+
+func (a *api) GetWorkflowInstanceByID(ctx context.Context, id string) (*graphclient.GetWorkflowInstanceByID, error) {
+	return a.c.GetWorkflowInstanceByID(ctx, id)
+}
+
+func (a *api) GetWorkflowEvents(ctx context.Context, first *int64, after *string, where *graphclient.WorkflowEventWhereInput) (*graphclient.GetWorkflowEvents, error) {
+	return a.c.GetWorkflowEvents(ctx, first, nil, after, nil, where, nil)
+}
+
+func (a *api) GetMyWorkflowAssignments(ctx context.Context, first *int64, after *string, where *graphclient.WorkflowAssignmentWhereInput) (*graphclient.GetMyWorkflowAssignments, error) {
+	return a.c.GetMyWorkflowAssignments(ctx, first, nil, after, nil, nil, where)
+}
+
+func (a *api) GetWorkflowAssignments(ctx context.Context, first *int64, after *string, where *graphclient.WorkflowAssignmentWhereInput) (*graphclient.GetWorkflowAssignments, error) {
+	return a.c.GetWorkflowAssignments(ctx, first, nil, after, nil, where, nil)
+}
+
+func (a *api) GetWorkflowAssignmentByID(ctx context.Context, id string) (*graphclient.GetWorkflowAssignmentByID, error) {
+	return a.c.GetWorkflowAssignmentByID(ctx, id)
+}
+
+func (a *api) GetGroups(ctx context.Context, first *int64, after *string, where *graphclient.GroupWhereInput) (*graphclient.GetGroups, error) {
+	return a.c.GetGroups(ctx, first, nil, after, nil, where, nil)
+}
+
+func (a *api) GetGroupByID(ctx context.Context, id string) (*graphclient.GetGroupByID, error) {
+	return a.c.GetGroupByID(ctx, id)
+}
+
+func (a *api) GetUsers(ctx context.Context, first *int64, after *string, where *graphclient.UserWhereInput) (*graphclient.GetUsers, error) {
+	return a.c.GetUsers(ctx, first, nil, after, nil, where, nil)
+}
+
+func (a *api) GetUserByID(ctx context.Context, id string) (*graphclient.GetUserByID, error) {
+	return a.c.GetUserByID(ctx, id)
+}
+
+func (a *api) CreateWorkflowDefinition(ctx context.Context, input graphclient.CreateWorkflowDefinitionInput) (*graphclient.CreateWorkflowDefinition, error) {
+	return a.c.CreateWorkflowDefinition(ctx, input)
+}
+
+func (a *api) UpdateWorkflowDefinition(ctx context.Context, id string, input graphclient.UpdateWorkflowDefinitionInput) (*graphclient.UpdateWorkflowDefinition, error) {
+	return a.c.UpdateWorkflowDefinition(ctx, id, input)
+}
+
+func (a *api) DeleteWorkflowDefinition(ctx context.Context, id string) (string, error) {
+	resp, err := a.c.DeleteWorkflowDefinition(ctx, id)
+	if err != nil {
+		return "", err
+	}
+	return resp.DeleteWorkflowDefinition.DeletedID, nil
+}
+
+func (a *api) ApproveWorkflowAssignment(ctx context.Context, id string) (*graphclient.ApproveWorkflowAssignment, error) {
+	return a.c.ApproveWorkflowAssignment(ctx, id)
+}
+
+func (a *api) RejectWorkflowAssignment(ctx context.Context, id string, reason *string) (*graphclient.RejectWorkflowAssignment, error) {
+	return a.c.RejectWorkflowAssignment(ctx, id, reason)
 }
 
 func (a *api) CreateControl(ctx context.Context, input graphclient.CreateControlInput) (*graphclient.CreateControl, error) {

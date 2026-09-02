@@ -2,6 +2,7 @@ package tools
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
@@ -47,6 +48,13 @@ func registerDeletes(server *mcp.Server, h *handlers) {
 		Description: "Permanently delete a task by ID. Requires delete mode.",
 		Annotations: deleteAnnotations(),
 	}, h.deleteTask)
+
+	addTool(server, &mcp.Tool{
+		Name:        "openlane_workflow_delete",
+		Title:       "Delete an Openlane workflow definition",
+		Description: "Permanently delete a workflow definition by ID. Requires delete mode and confirm: true.",
+		Annotations: deleteAnnotations(),
+	}, h.deleteWorkflow)
 }
 
 func (h *handlers) deleteControl(ctx context.Context, _ *mcp.CallToolRequest, in getInput) (*mcp.CallToolResult, deleteResult, error) {
@@ -67,6 +75,47 @@ func (h *handlers) deleteRisk(ctx context.Context, _ *mcp.CallToolRequest, in ge
 
 func (h *handlers) deleteTask(ctx context.Context, _ *mcp.CallToolRequest, in getInput) (*mcp.CallToolResult, deleteResult, error) {
 	return h.deleteByID(ctx, in.ID, h.api.DeleteTask)
+}
+
+type deleteWorkflowInput struct {
+	ID      string `json:"id" jsonschema:"Workflow definition ID to delete."`
+	Confirm bool   `json:"confirm" jsonschema:"Must be true to persist. If false, returns a preview only."`
+}
+
+type deleteWorkflowResult struct {
+	Confirmed bool   `json:"confirmed"`
+	Error     string `json:"error,omitempty"`
+	DeletedID string `json:"deleted_id,omitempty"`
+	ID        string `json:"id,omitempty"`
+	Name      string `json:"name,omitempty"`
+	Summary   string `json:"summary,omitempty"`
+}
+
+func (h *handlers) deleteWorkflow(ctx context.Context, _ *mcp.CallToolRequest, in deleteWorkflowInput) (*mcp.CallToolResult, deleteWorkflowResult, error) {
+	if in.ID == "" {
+		return nil, deleteWorkflowResult{}, errIDRequired
+	}
+	existing, err := h.api.GetWorkflowDefinitionByID(ctx, in.ID)
+	if err != nil {
+		return nil, deleteWorkflowResult{}, openlane.APIError(err)
+	}
+	item := mapWorkflowDefinition(existing.WorkflowDefinition)
+	out := deleteWorkflowResult{ID: item.ID, Name: item.Name, Summary: "Would delete workflow " + item.Name}
+	if !in.Confirm {
+		out.Error = errConfirmationRequired
+		return nil, out, nil
+	}
+	deletedID, err := h.api.DeleteWorkflowDefinition(ctx, in.ID)
+	if err != nil {
+		return nil, deleteWorkflowResult{}, openlane.APIError(err)
+	}
+	if _, err := h.api.GetWorkflowDefinitionByID(ctx, in.ID); err == nil {
+		return nil, deleteWorkflowResult{}, fmt.Errorf("workflow delete reported success but definition still exists")
+	}
+	out.Confirmed = true
+	out.DeletedID = deletedID
+	out.Summary = "Deleted workflow " + item.Name
+	return nil, out, nil
 }
 
 type deleteFn func(context.Context, string) (string, error)

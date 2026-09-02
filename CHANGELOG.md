@@ -4,6 +4,21 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- `openlane_policies_awaiting_approval` convenience tool combining native `NEEDS_APPROVAL` policies and pending workflow assignments on policies
+- `status` filter on `openlane_policies_list`
+- `object_type`-only filter on `openlane_workflow_instances_list` (no `object_id` required)
+- Documentation clarifying native InternalPolicy approval vs WorkflowAssignment approval paths
+- Group and user lookup tools (`openlane_groups_list` / `openlane_group_get`, `openlane_users_list` / `openlane_user_get`)
+- Confirmed workflow definition create/update/delete (`openlane_workflow_create`, `openlane_workflow_update`, `openlane_workflow_delete`) with live `workflowMetadata` validation and a copied core JSON schema
+- Workflow assignment approve/reject plus custom-GraphQL request-changes and reassign
+- Native InternalPolicy lifecycle tools (`openlane_policy_submit_for_approval`, `openlane_policy_approve`, `openlane_policy_publish`, `openlane_policy_return_to_draft`) via status-only `updateInternalPolicy`
+- Per-call `confirm: true` on workflow and native policy lifecycle writes (preview returned when omitted)
+- Eight read-only workflow tools: definitions (`openlane_workflows_list`, `openlane_workflows_search`, `openlane_workflow_get`), instances (`openlane_workflow_instances_list`, `openlane_workflow_instance_get`), assignments (`openlane_workflow_assignments_list`, `openlane_workflow_assignment_get`), and metadata (`openlane_workflow_metadata_get`)
+- Plain-English `summary` on workflow definition and assignment get responses
+- Custom GraphQL for `workflowMetadata`, assignment `dueAt`/targets, and instance `proposalPreview` where go-client v0.14.0 Get selection sets omit fields
+
 ## [0.4.0] - 2026-09-02
 
 ### Added

@@ -23,8 +23,14 @@ func (f *fakeAPI) UpdateEvidence(context.Context, string, graphclient.UpdateEvid
 func (f *fakeAPI) CreateInternalPolicy(context.Context, graphclient.CreateInternalPolicyInput) (*graphclient.CreateInternalPolicy, error) {
 	return nil, errors.New("unused")
 }
-func (f *fakeAPI) UpdateInternalPolicy(context.Context, string, graphclient.UpdateInternalPolicyInput) (*graphclient.UpdateInternalPolicy, error) {
-	return nil, errors.New("unused")
+func (f *fakeAPI) UpdateInternalPolicy(_ context.Context, _ string, input graphclient.UpdateInternalPolicyInput) (*graphclient.UpdateInternalPolicy, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	if f.policy != nil && input.Status != nil {
+		f.policy.InternalPolicy.Status = input.Status
+	}
+	return &graphclient.UpdateInternalPolicy{}, nil
 }
 func (f *fakeAPI) CreateRisk(context.Context, graphclient.CreateRiskInput) (*graphclient.CreateRisk, error) {
 	return nil, errors.New("unused")

@@ -147,6 +147,15 @@ func buildProgramWhere(in programListInput) *graphclient.ProgramWhereInput {
 	return &graphclient.ProgramWhereInput{NameContainsFold: &s}
 }
 
+func buildPolicyWhere(in policyListInput) *graphclient.InternalPolicyWhereInput {
+	s := strings.TrimSpace(in.Status)
+	if s == "" {
+		return nil
+	}
+	st := enums.DocumentStatus(s)
+	return &graphclient.InternalPolicyWhereInput{Status: &st}
+}
+
 func buildEvidenceWhere(in evidenceListInput) *graphclient.EvidenceWhereInput {
 	var w graphclient.EvidenceWhereInput
 	has := false
