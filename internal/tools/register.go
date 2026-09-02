@@ -19,6 +19,9 @@ func Register(server *mcp.Server, api openlane.GraphAPI, opts Options) {
 	registerEntities(server, h)
 	registerAssets(server, h)
 	registerContacts(server, h)
+	registerImplementations(server, h)
+	registerAssessments(server, h)
+	registerFindings(server, h)
 	if opts.AllowWrite {
 		registerWriteControls(server, h)
 		registerWriteEvidence(server, h)

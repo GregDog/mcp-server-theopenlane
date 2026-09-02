@@ -25,14 +25,14 @@ type assetItem struct {
 }
 
 func registerAssets(server *mcp.Server, h *handlers) {
-	mcp.AddTool(server, &mcp.Tool{
+	addTool(server, &mcp.Tool{
 		Name:        "openlane_assets_list",
 		Title:       "List Openlane assets",
 		Description: "List assets in the configured Openlane organization. Results are paginated.",
 		Annotations: readOnly(),
 	}, h.listAssets)
 
-	mcp.AddTool(server, &mcp.Tool{
+	addTool(server, &mcp.Tool{
 		Name:        "openlane_asset_get",
 		Title:       "Get an Openlane asset",
 		Description: "Get a single asset by ID.",

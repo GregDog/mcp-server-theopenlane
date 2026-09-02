@@ -31,14 +31,14 @@ type updateRiskInput struct {
 }
 
 func registerWriteRisks(server *mcp.Server, h *handlers) {
-	mcp.AddTool(server, &mcp.Tool{
+	addTool(server, &mcp.Tool{
 		Name:        "openlane_risk_create",
 		Title:       "Create an Openlane risk",
 		Description: "Create a risk in Openlane. Requires write mode.",
 		Annotations: writeAnnotations(),
 	}, h.createRisk)
 
-	mcp.AddTool(server, &mcp.Tool{
+	addTool(server, &mcp.Tool{
 		Name:        "openlane_risk_update",
 		Title:       "Update an Openlane risk",
 		Description: "Update a risk by ID. Requires write mode.",

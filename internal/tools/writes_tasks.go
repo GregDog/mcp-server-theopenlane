@@ -34,14 +34,14 @@ type updateTaskInput struct {
 }
 
 func registerWriteTasks(server *mcp.Server, h *handlers) {
-	mcp.AddTool(server, &mcp.Tool{
+	addTool(server, &mcp.Tool{
 		Name:        "openlane_task_create",
 		Title:       "Create an Openlane task",
 		Description: "Create a task in Openlane. Requires write mode.",
 		Annotations: writeAnnotations(),
 	}, h.createTask)
 
-	mcp.AddTool(server, &mcp.Tool{
+	addTool(server, &mcp.Tool{
 		Name:        "openlane_task_update",
 		Title:       "Update an Openlane task",
 		Description: "Update a task by ID. Requires write mode.",

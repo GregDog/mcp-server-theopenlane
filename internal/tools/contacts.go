@@ -22,14 +22,14 @@ type contactItem struct {
 }
 
 func registerContacts(server *mcp.Server, h *handlers) {
-	mcp.AddTool(server, &mcp.Tool{
+	addTool(server, &mcp.Tool{
 		Name:        "openlane_contacts_list",
 		Title:       "List Openlane contacts",
 		Description: "List contacts in the configured Openlane organization. Results are paginated.",
 		Annotations: readOnly(),
 	}, h.listContacts)
 
-	mcp.AddTool(server, &mcp.Tool{
+	addTool(server, &mcp.Tool{
 		Name:        "openlane_contact_get",
 		Title:       "Get an Openlane contact",
 		Description: "Get a single contact by ID.",

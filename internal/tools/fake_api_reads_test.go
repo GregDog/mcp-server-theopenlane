@@ -28,3 +28,27 @@ func (f *fakeAPI) GetContacts(context.Context, *int64, *string, *graphclient.Con
 func (f *fakeAPI) GetContactByID(context.Context, string) (*graphclient.GetContactByID, error) {
 	return nil, errors.New("unused")
 }
+func (f *fakeAPI) GetControlImplementations(context.Context, *int64, *string, *graphclient.ControlImplementationWhereInput) (*graphclient.GetControlImplementations, error) {
+	return nil, errors.New("unused")
+}
+func (f *fakeAPI) GetControlImplementationByID(context.Context, string) (*graphclient.GetControlImplementationByID, error) {
+	return nil, errors.New("unused")
+}
+func (f *fakeAPI) GetAssessments(context.Context, *int64, *string, *graphclient.AssessmentWhereInput) (*graphclient.GetAssessments, error) {
+	return nil, errors.New("unused")
+}
+func (f *fakeAPI) GetAssessmentByID(context.Context, string) (*graphclient.GetAssessmentByID, error) {
+	return nil, errors.New("unused")
+}
+func (f *fakeAPI) GetAssessmentResponses(context.Context, *int64, *string, *graphclient.AssessmentResponseWhereInput) (*graphclient.GetAssessmentResponses, error) {
+	return nil, errors.New("unused")
+}
+func (f *fakeAPI) GetFindings(context.Context, *int64, *string, *graphclient.FindingWhereInput) (*graphclient.GetFindings, error) {
+	return nil, errors.New("unused")
+}
+func (f *fakeAPI) GetFindingByID(context.Context, string) (*graphclient.GetFindingByID, error) {
+	return nil, errors.New("unused")
+}
+func (f *fakeAPI) GetRemediations(context.Context, *int64, *string, *graphclient.RemediationWhereInput) (*graphclient.GetRemediations, error) {
+	return nil, errors.New("unused")
+}

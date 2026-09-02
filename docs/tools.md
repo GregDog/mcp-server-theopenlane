@@ -2,7 +2,11 @@
 
 Read tools are always registered. Write and delete tools are registered only when their mode is enabled.
 
+With all modes enabled there are **42 tools** (27 read, 10 write, 5 delete).
+
 Arguments are validated by the MCP Go SDK from Go structs.
+
+## Pagination
 
 List and search tools accept:
 
@@ -26,31 +30,63 @@ List responses:
 
 Get tools require `id`.
 
+## Relationship summaries
+
+Enriched get tools return compact relationship blocks:
+
+```json
+{
+  "findings": {
+    "count": 3,
+    "items": [
+      {"id": "...", "name": "...", "severity": "high", "open": true}
+    ]
+  }
+}
+```
+
+Each get tool fetches at most eight related items per relationship (plus `total_count` from Openlane when available). Omitted summaries mean the relation could not be loaded or is empty.
+
 ## Controls
 
 | Tool | Openlane client |
 | --- | --- |
 | `openlane_controls_list` | `GetControls` |
 | `openlane_controls_search` | `GetControls` with `ControlWhereInput` |
-| `openlane_control_get` | `GetControlByID` |
+| `openlane_control_get` | `GetControlByID` + bounded relation lists |
 
-Search matches ref code, title, or description (`ContainsFold`). The current client has no `ControlSearch` operation.
+`openlane_control_get` includes assessment methods/objectives and summaries of programs, evidence, findings, risks, and implementations.
 
 ## Programs
 
 | Tool | Openlane client |
 | --- | --- |
 | `openlane_programs_list` | `GetPrograms` |
-| `openlane_program_get` | `GetProgramByID` |
+| `openlane_program_get` | `GetProgramByID` + bounded relation lists |
+
+`openlane_programs_list` filters:
+
+| Field | Maps to |
+| --- | --- |
+| `name` | `NameContainsFold` |
+
+`openlane_program_get` includes auditor metadata and summaries of evidence, findings, risks, tasks, and remediations.
 
 ## Evidence
 
 | Tool | Openlane client |
 | --- | --- |
 | `openlane_evidence_list` | `GetEvidences` |
-| `openlane_evidence_get` | `GetEvidenceByID` |
+| `openlane_evidence_get` | `GetEvidenceByID` + program summary |
 
-List responses omit file contents. Get responses include `file_ids` but not presigned URLs.
+`openlane_evidence_list` filters:
+
+| Field | Maps to |
+| --- | --- |
+| `program_id` | `HasProgramsWith` |
+| `control_id` | `HasControlsWith` |
+
+List responses omit file contents. Get responses include `file_ids` and file metadata (`id` only) but not presigned URLs.
 
 ## Policies
 
@@ -66,7 +102,67 @@ MCP names use “policy”; the Openlane type is `InternalPolicy`.
 | Tool | Openlane client |
 | --- | --- |
 | `openlane_risks_list` | `GetRisks` |
-| `openlane_risk_get` | `GetRiskByID` |
+| `openlane_risk_get` | `GetRiskByID` + bounded relation lists |
+
+`openlane_risks_list` filters:
+
+| Field | Maps to |
+| --- | --- |
+| `program_id` | `HasProgramsWith` |
+| `entity_id` | `HasEntitiesWith` |
+| `control_id` | `HasControlsWith` |
+| `status` | `RiskStatus` |
+
+`openlane_risk_get` includes owner/stakeholder IDs and summaries of controls, programs, findings, and remediations.
+
+## Findings
+
+| Tool | Openlane client |
+| --- | --- |
+| `openlane_findings_list` | `GetFindings` |
+| `openlane_finding_get` | `GetFindingByID` + bounded control summary |
+
+`openlane_findings_list` filters:
+
+| Field | Maps to |
+| --- | --- |
+| `program_id` | `HasProgramsWith` |
+| `assessment_id` | `AssessmentID` |
+| `open` | `Open` |
+| `status` | `FindingStatusName` |
+| `severity` | `Severity` |
+
+`openlane_finding_get` includes description, impact, recommendation, remediations, vulnerabilities, and linked controls. Raw scanner payloads (`rawPayload`, `metadata`) are omitted from list responses.
+
+## Assessments
+
+| Tool | Openlane client |
+| --- | --- |
+| `openlane_assessments_list` | `GetAssessments` |
+| `openlane_assessment_get` | `GetAssessmentByID` + bounded responses/findings |
+
+`openlane_assessments_list` filters:
+
+| Field | Maps to |
+| --- | --- |
+| `assessment_type` | `AssessmentType` |
+
+## Control implementations
+
+| Tool | Openlane client |
+| --- | --- |
+| `openlane_control_implementations_list` | `GetControlImplementations` |
+| `openlane_control_implementation_get` | `GetControlImplementationByID` |
+
+`openlane_control_implementations_list` filters:
+
+| Field | Maps to |
+| --- | --- |
+| `control_id` | `HasControlsWith` |
+| `status` | `Status` |
+| `verified` | `Verified` |
+
+Implementation get responses include control/subcontrol `ref_code` values (not control IDs in the generated client selection set).
 
 ## Standards
 
@@ -87,9 +183,24 @@ MCP names use “policy”; the Openlane type is `InternalPolicy`.
 | Tool | Openlane client |
 | --- | --- |
 | `openlane_entities_list` | `GetEntities` |
-| `openlane_entity_get` | `GetEntityByID` |
+| `openlane_entity_get` | `GetEntityByID` + bounded assets/risks/findings |
 
 Entities represent vendors and other third parties in Openlane. There is no separate vendor API in the current Go client.
+
+`openlane_entities_list` filters:
+
+| Field | Maps to |
+| --- | --- |
+| `risk_rating` | `RiskRating` |
+| `tier` | `Tier` |
+| `approved_for_use` | `ApprovedForUse` |
+| `questionnaire_status` | `EntitySecurityQuestionnaireStatusName` |
+| `next_review_before` | `NextReviewAtLTE` |
+| `has_soc2` | `HasSoc2` |
+| `sso_enforced` | `SsoEnforced` |
+| `mfa_enforced` | `MfaEnforced` |
+
+`openlane_entity_get` exposes vendor/security/commercial fields (SOC 2, SSO/MFA, contract, spend, reviews, owner) and bounded relationship summaries.
 
 ## Assets
 
@@ -140,4 +251,19 @@ Enabled with `OPENLANE_ALLOW_DELETE=true` or `openlane-mcp serve --allow-delete`
 
 Delete tools require `id` and return `deleted_id`.
 
-Verified against `github.com/theopenlane/go-client` v0.14.0, the latest stable release at implementation time.
+## Generated Get-query gaps (go-client v0.14.0)
+
+The following fields exist on Openlane core models or WhereInputs but are **not** returned by the stock `Get*ByID` queries in `github.com/theopenlane/go-client` v0.14.0:
+
+- Program observation period and fieldwork dates
+- Entity domains, provided services, risk score coverage, review frequency, entity type name
+- Risk decision, residual score, review fields; linked entities/assets from `risk_get` (no reverse WhereInput)
+- Control implementation status on control get; nested owner objects
+- Evidence review frequency
+- Assessment questionnaire config; responses not nested in assessment Get
+- Finding `displayID` and review fields
+- Control implementation related control IDs (ref codes only)
+
+Do not expect MCP tools to surface these until the official client Get selection sets include them.
+
+Verified against `github.com/theopenlane/go-client` v0.14.0.

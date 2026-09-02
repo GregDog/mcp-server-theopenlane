@@ -39,6 +39,14 @@ type GraphAPI interface {
 	GetAssetByID(ctx context.Context, id string) (*graphclient.GetAssetByID, error)
 	GetContacts(ctx context.Context, first *int64, after *string, where *graphclient.ContactWhereInput) (*graphclient.GetContacts, error)
 	GetContactByID(ctx context.Context, id string) (*graphclient.GetContactByID, error)
+	GetControlImplementations(ctx context.Context, first *int64, after *string, where *graphclient.ControlImplementationWhereInput) (*graphclient.GetControlImplementations, error)
+	GetControlImplementationByID(ctx context.Context, id string) (*graphclient.GetControlImplementationByID, error)
+	GetAssessments(ctx context.Context, first *int64, after *string, where *graphclient.AssessmentWhereInput) (*graphclient.GetAssessments, error)
+	GetAssessmentByID(ctx context.Context, id string) (*graphclient.GetAssessmentByID, error)
+	GetAssessmentResponses(ctx context.Context, first *int64, after *string, where *graphclient.AssessmentResponseWhereInput) (*graphclient.GetAssessmentResponses, error)
+	GetFindings(ctx context.Context, first *int64, after *string, where *graphclient.FindingWhereInput) (*graphclient.GetFindings, error)
+	GetFindingByID(ctx context.Context, id string) (*graphclient.GetFindingByID, error)
+	GetRemediations(ctx context.Context, first *int64, after *string, where *graphclient.RemediationWhereInput) (*graphclient.GetRemediations, error)
 	CreateControl(ctx context.Context, input graphclient.CreateControlInput) (*graphclient.CreateControl, error)
 	UpdateControl(ctx context.Context, id string, input graphclient.UpdateControlInput) (*graphclient.UpdateControl, error)
 	CreateEvidence(ctx context.Context, input graphclient.CreateEvidenceInput, evidenceFiles []*graphql.Upload) (*graphclient.CreateEvidence, error)
@@ -165,6 +173,38 @@ func (a *api) GetContacts(ctx context.Context, first *int64, after *string, wher
 
 func (a *api) GetContactByID(ctx context.Context, id string) (*graphclient.GetContactByID, error) {
 	return a.c.GetContactByID(ctx, id)
+}
+
+func (a *api) GetControlImplementations(ctx context.Context, first *int64, after *string, where *graphclient.ControlImplementationWhereInput) (*graphclient.GetControlImplementations, error) {
+	return a.c.GetControlImplementations(ctx, first, nil, after, nil, where, nil)
+}
+
+func (a *api) GetControlImplementationByID(ctx context.Context, id string) (*graphclient.GetControlImplementationByID, error) {
+	return a.c.GetControlImplementationByID(ctx, id)
+}
+
+func (a *api) GetAssessments(ctx context.Context, first *int64, after *string, where *graphclient.AssessmentWhereInput) (*graphclient.GetAssessments, error) {
+	return a.c.GetAssessments(ctx, first, nil, after, nil, where, nil)
+}
+
+func (a *api) GetAssessmentByID(ctx context.Context, id string) (*graphclient.GetAssessmentByID, error) {
+	return a.c.GetAssessmentByID(ctx, id)
+}
+
+func (a *api) GetAssessmentResponses(ctx context.Context, first *int64, after *string, where *graphclient.AssessmentResponseWhereInput) (*graphclient.GetAssessmentResponses, error) {
+	return a.c.GetAssessmentResponses(ctx, first, nil, after, nil, where, nil)
+}
+
+func (a *api) GetFindings(ctx context.Context, first *int64, after *string, where *graphclient.FindingWhereInput) (*graphclient.GetFindings, error) {
+	return a.c.GetFindings(ctx, first, nil, after, nil, where, nil)
+}
+
+func (a *api) GetFindingByID(ctx context.Context, id string) (*graphclient.GetFindingByID, error) {
+	return a.c.GetFindingByID(ctx, id)
+}
+
+func (a *api) GetRemediations(ctx context.Context, first *int64, after *string, where *graphclient.RemediationWhereInput) (*graphclient.GetRemediations, error) {
+	return a.c.GetRemediations(ctx, first, nil, after, nil, where, nil)
 }
 
 func (a *api) CreateControl(ctx context.Context, input graphclient.CreateControlInput) (*graphclient.CreateControl, error) {

@@ -24,7 +24,9 @@ The server is read-only by default. Write and delete tools are opt-in and indepe
 
 ## Features
 
-- Openlane MCP access for programs, controls, evidence, policies, risks, standards, tasks, entities (vendors), assets, and contacts
+- Openlane MCP access for programs, controls, evidence, policies, risks, standards, tasks, entities (vendors), assets, contacts, findings, assessments, and control implementations
+- Enriched get tools with vendor/security fields and compact relationship summaries
+- List filters on entities, risks, findings, evidence, programs, assessments, and implementations
 - Opt-in create/update tools for controls, evidence, policies, risks, and tasks
 - Opt-in delete tools for the same domains (except programs and standards)
 - Openlane Cloud and self-hosted Openlane (configurable base URL)
@@ -149,21 +151,27 @@ Tokens are never logged. See [docs/security.md](docs/security.md).
 | --- | --- |
 | `openlane_controls_list` | List controls |
 | `openlane_controls_search` | Search controls by ref code, title, or description |
-| `openlane_control_get` | Get a control by ID |
-| `openlane_programs_list` | List programs |
-| `openlane_program_get` | Get a program by ID |
-| `openlane_evidence_list` | List evidence metadata |
+| `openlane_control_get` | Get a control by ID (with relationship summaries) |
+| `openlane_programs_list` | List programs (optional name filter) |
+| `openlane_program_get` | Get a program by ID (with relationship summaries) |
+| `openlane_evidence_list` | List evidence metadata (optional program/control filters) |
 | `openlane_evidence_get` | Get evidence metadata by ID |
 | `openlane_policies_list` | List internal policies |
 | `openlane_policy_get` | Get a policy by ID |
-| `openlane_risks_list` | List risks |
-| `openlane_risk_get` | Get a risk by ID |
+| `openlane_risks_list` | List risks (optional program/entity/control/status filters) |
+| `openlane_risk_get` | Get a risk by ID (with relationship summaries) |
+| `openlane_findings_list` | List findings (optional program/assessment/open/status/severity filters) |
+| `openlane_finding_get` | Get a finding by ID |
+| `openlane_assessments_list` | List assessments |
+| `openlane_assessment_get` | Get an assessment by ID |
+| `openlane_control_implementations_list` | List control implementations |
+| `openlane_control_implementation_get` | Get a control implementation by ID |
 | `openlane_standards_list` | List standards / frameworks |
 | `openlane_standard_get` | Get a standard by ID |
 | `openlane_tasks_list` | List tasks |
 | `openlane_task_get` | Get a task by ID |
-| `openlane_entities_list` | List entities (vendors and third parties) |
-| `openlane_entity_get` | Get an entity by ID |
+| `openlane_entities_list` | List entities (vendors; optional risk/tier/review/security filters) |
+| `openlane_entity_get` | Get an entity by ID (vendor/security/commercial fields) |
 | `openlane_assets_list` | List assets |
 | `openlane_asset_get` | Get an asset by ID |
 | `openlane_contacts_list` | List contacts |
@@ -189,7 +197,9 @@ Delete tools (require `OPENLANE_ALLOW_DELETE=true` or `--allow-delete`):
 | `openlane_risk_delete` | Delete a risk by ID |
 | `openlane_task_delete` | Delete a task by ID |
 
-See [docs/tools.md](docs/tools.md) for full details. With all modes enabled there are **37 tools** (21 read, 10 write, 5 delete).
+See [docs/tools.md](docs/tools.md) for full details. With all modes enabled there are **42 tools** (27 read, 10 write, 5 delete).
+
+Enriched get tools return bounded relationship summaries (`count` + `items`) so agents can answer program, vendor, control, and finding questions without chaining dozens of shallow calls.
 
 List responses are paginated (`items`, `next_cursor`, `has_more`, `total_count`). Default page size is 20; maximum is 50.
 

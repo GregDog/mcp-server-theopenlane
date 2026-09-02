@@ -38,14 +38,14 @@ type updateEvidenceInput struct {
 }
 
 func registerWriteEvidence(server *mcp.Server, h *handlers) {
-	mcp.AddTool(server, &mcp.Tool{
+	addTool(server, &mcp.Tool{
 		Name:        "openlane_evidence_create",
 		Title:       "Create Openlane evidence",
 		Description: "Create evidence in Openlane. Optional files are uploaded as base64 payloads. Requires write mode.",
 		Annotations: writeAnnotations(),
 	}, h.createEvidence)
 
-	mcp.AddTool(server, &mcp.Tool{
+	addTool(server, &mcp.Tool{
 		Name:        "openlane_evidence_update",
 		Title:       "Update Openlane evidence",
 		Description: "Update evidence by ID. Optional files are uploaded as base64 payloads. Requires write mode.",

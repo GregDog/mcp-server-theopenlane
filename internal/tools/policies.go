@@ -20,14 +20,14 @@ type policyItem struct {
 }
 
 func registerPolicies(server *mcp.Server, h *handlers) {
-	mcp.AddTool(server, &mcp.Tool{
+	addTool(server, &mcp.Tool{
 		Name:        "openlane_policies_list",
 		Title:       "List Openlane policies",
 		Description: "List internal policies in the configured Openlane organization. Results are paginated.",
 		Annotations: readOnly(),
 	}, h.listPolicies)
 
-	mcp.AddTool(server, &mcp.Tool{
+	addTool(server, &mcp.Tool{
 		Name:        "openlane_policy_get",
 		Title:       "Get an Openlane policy",
 		Description: "Get a single internal policy by ID.",

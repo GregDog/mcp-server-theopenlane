@@ -13,35 +13,35 @@ type deleteResult struct {
 }
 
 func registerDeletes(server *mcp.Server, h *handlers) {
-	mcp.AddTool(server, &mcp.Tool{
+	addTool(server, &mcp.Tool{
 		Name:        "openlane_control_delete",
 		Title:       "Delete an Openlane control",
 		Description: "Permanently delete a control by ID. Requires delete mode.",
 		Annotations: deleteAnnotations(),
 	}, h.deleteControl)
 
-	mcp.AddTool(server, &mcp.Tool{
+	addTool(server, &mcp.Tool{
 		Name:        "openlane_evidence_delete",
 		Title:       "Delete Openlane evidence",
 		Description: "Permanently delete an evidence record by ID. Requires delete mode.",
 		Annotations: deleteAnnotations(),
 	}, h.deleteEvidence)
 
-	mcp.AddTool(server, &mcp.Tool{
+	addTool(server, &mcp.Tool{
 		Name:        "openlane_policy_delete",
 		Title:       "Delete an Openlane policy",
 		Description: "Permanently delete an internal policy by ID. Requires delete mode.",
 		Annotations: deleteAnnotations(),
 	}, h.deletePolicy)
 
-	mcp.AddTool(server, &mcp.Tool{
+	addTool(server, &mcp.Tool{
 		Name:        "openlane_risk_delete",
 		Title:       "Delete an Openlane risk",
 		Description: "Permanently delete a risk by ID. Requires delete mode.",
 		Annotations: deleteAnnotations(),
 	}, h.deleteRisk)
 
-	mcp.AddTool(server, &mcp.Tool{
+	addTool(server, &mcp.Tool{
 		Name:        "openlane_task_delete",
 		Title:       "Delete an Openlane task",
 		Description: "Permanently delete a task by ID. Requires delete mode.",

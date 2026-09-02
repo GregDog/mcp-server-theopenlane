@@ -35,14 +35,14 @@ type updateControlInput struct {
 }
 
 func registerWriteControls(server *mcp.Server, h *handlers) {
-	mcp.AddTool(server, &mcp.Tool{
+	addTool(server, &mcp.Tool{
 		Name:        "openlane_control_create",
 		Title:       "Create an Openlane control",
 		Description: "Create a control in the configured Openlane organization. Requires write mode.",
 		Annotations: writeAnnotations(),
 	}, h.createControl)
 
-	mcp.AddTool(server, &mcp.Tool{
+	addTool(server, &mcp.Tool{
 		Name:        "openlane_control_update",
 		Title:       "Update an Openlane control",
 		Description: "Update a control by ID. Requires write mode.",

@@ -36,6 +36,8 @@ type Config struct {
 
 // FromEnv loads configuration. OPENLANE_API_TOKEN is required.
 func FromEnv() (Config, error) {
+	loadDotEnvFiles()
+
 	cfg := Config{
 		APIToken:         strings.TrimSpace(os.Getenv("OPENLANE_API_TOKEN")),
 		BaseURL:          strings.TrimSpace(os.Getenv("OPENLANE_BASE_URL")),

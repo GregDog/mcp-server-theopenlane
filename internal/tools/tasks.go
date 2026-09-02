@@ -10,14 +10,14 @@ import (
 )
 
 func registerTasks(server *mcp.Server, h *handlers) {
-	mcp.AddTool(server, &mcp.Tool{
+	addTool(server, &mcp.Tool{
 		Name:        "openlane_tasks_list",
 		Title:       "List Openlane tasks",
 		Description: "List tasks in the configured Openlane organization. Results are paginated.",
 		Annotations: readOnly(),
 	}, h.listTasks)
 
-	mcp.AddTool(server, &mcp.Tool{
+	addTool(server, &mcp.Tool{
 		Name:        "openlane_task_get",
 		Title:       "Get an Openlane task",
 		Description: "Get a single task by ID.",

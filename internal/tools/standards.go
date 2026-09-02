@@ -22,14 +22,14 @@ type standardItem struct {
 }
 
 func registerStandards(server *mcp.Server, h *handlers) {
-	mcp.AddTool(server, &mcp.Tool{
+	addTool(server, &mcp.Tool{
 		Name:        "openlane_standards_list",
 		Title:       "List Openlane standards",
 		Description: "List standards and frameworks available in Openlane. Results are paginated.",
 		Annotations: readOnly(),
 	}, h.listStandards)
 
-	mcp.AddTool(server, &mcp.Tool{
+	addTool(server, &mcp.Tool{
 		Name:        "openlane_standard_get",
 		Title:       "Get an Openlane standard",
 		Description: "Get a single standard by ID.",

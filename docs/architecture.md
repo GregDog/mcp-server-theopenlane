@@ -20,6 +20,8 @@ internal/tools          MCP tool handlers (read / write / delete)
 
 Evidence file uploads decode base64 MCP payloads and pass `graphql.Upload` values to `CreateEvidence` / `UpdateEvidence`. There is no separate upload API.
 
+Enriched get tools issue one primary `Get*ByID` call plus bounded parallel list queries for relationship summaries (up to eight items per relation). There is no built-in compliance scoring or gap analysis.
+
 There is no built-in MCP authentication in HTTP mode. The Openlane API token is process-wide configuration. Remote deployment requires a trusted external authentication reverse-proxy layer.
 
 ## Security model

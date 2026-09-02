@@ -4,6 +4,21 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-09-02
+
+### Added
+
+- Six new read tools: findings, assessments, and control implementations (`openlane_findings_*`, `openlane_assessments_*`, `openlane_control_implementations_*`)
+- Enriched get responses for programs, controls, entities, risks, and evidence with compact relationship summaries
+- List filters on entities, risks, findings, evidence, programs, assessments, and control implementations
+- Optional `.env` auto-load when `OPENLANE_API_TOKEN` is unset (searches `OPENLANE_ENV_FILE`, cwd, and binary-relative paths)
+- `scripts/mcp-verify.sh` to confirm MCP tool registration after `make build`
+
+### Fixed
+
+- Omit per-tool `outputSchema` in `tools/list` so Cursor does not silently drop oversized tool lists (connected with 0 tools)
+- MCP Registry publish step in release workflow (`mcp-publisher` v1.8.1 download URL)
+
 ## [0.3.0] - 2026-09-02
 
 ### Added

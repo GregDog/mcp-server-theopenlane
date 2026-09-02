@@ -25,14 +25,14 @@ type updatePolicyInput struct {
 }
 
 func registerWritePolicies(server *mcp.Server, h *handlers) {
-	mcp.AddTool(server, &mcp.Tool{
+	addTool(server, &mcp.Tool{
 		Name:        "openlane_policy_create",
 		Title:       "Create an Openlane policy",
 		Description: "Create an internal policy in Openlane. Requires write mode.",
 		Annotations: writeAnnotations(),
 	}, h.createPolicy)
 
-	mcp.AddTool(server, &mcp.Tool{
+	addTool(server, &mcp.Tool{
 		Name:        "openlane_policy_update",
 		Title:       "Update an Openlane policy",
 		Description: "Update an internal policy by ID. Requires write mode.",

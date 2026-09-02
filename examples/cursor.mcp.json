@@ -2,11 +2,7 @@
   "mcpServers": {
     "openlane": {
       "command": "bash",
-      "args": ["${workspaceFolder}/scripts/mcp-serve.sh"],
-      "env": {
-        "OPENLANE_ALLOW_WRITE": "false",
-        "OPENLANE_ALLOW_DELETE": "false"
-      }
+      "args": ["${workspaceFolder}/scripts/mcp-serve.sh"]
     }
   }
 }
