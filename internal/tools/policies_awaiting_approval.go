@@ -39,8 +39,8 @@ type policyRef struct {
 
 func registerPoliciesAwaitingApproval(server *mcp.Server, h *handlers) {
 	addTool(server, &mcp.Tool{
-		Name:  "openlane_policies_awaiting_approval",
-		Title: "List Openlane policies awaiting approval",
+		Name:        "openlane_policies_awaiting_approval",
+		Title:       "List Openlane policies awaiting approval",
 		Description: "List policies that need approval via either path: native InternalPolicy status NEEDS_APPROVAL (org-wide), or your pending WorkflowAssignments on InternalPolicy objects. Use openlane_policy_approve for native items; use openlane_workflow_assignment_approve for workflow items. Results are bounded by limit (default 20, max 50 per path).",
 		Annotations: readOnly(),
 	}, h.listPoliciesAwaitingApproval)
