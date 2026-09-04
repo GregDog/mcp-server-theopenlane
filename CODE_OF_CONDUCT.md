@@ -32,8 +32,12 @@ Examples of unacceptable behavior:
 
 ## Enforcement
 
-Report unacceptable behavior through GitHub by contacting the maintainers of
-this repository. All complaints will be reviewed promptly and fairly.
+Report unacceptable behavior to the repository maintainer:
+
+- Open a [private security advisory](https://github.com/GregDog/mcp-server-theopenlane/security/advisories/new) if the report involves harassment, personal information, or other sensitive conduct.
+- Otherwise, contact [@GregDog](https://github.com/GregDog) via GitHub (issue comment mentioning the maintainer, or GitHub's contact flow).
+
+All complaints will be reviewed promptly and fairly.
 
 This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org),
 version 2.1.

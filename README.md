@@ -257,7 +257,9 @@ See [docs/development.md](docs/development.md).
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md). To add or extend an MCP tool, see [docs/adding-tools.md](docs/adding-tools.md).
+
+Issues labeled `good first issue` or `help wanted` are a good place to start.
 
 ## Licence
 

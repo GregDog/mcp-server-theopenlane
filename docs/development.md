@@ -1,6 +1,8 @@
 # Development
 
-Requires Go 1.27.
+Requires **Go 1.27** or later ([install](https://go.dev/dl/)). See [CONTRIBUTING.md](../CONTRIBUTING.md) for the fork → branch → pull request workflow.
+
+Unit tests (`make test`) do not require an Openlane API token. Live smoke tests are optional — see `make test-access` below.
 
 ```bash
 git clone https://github.com/GregDog/mcp-server-theopenlane.git
