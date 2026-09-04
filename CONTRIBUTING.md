@@ -10,7 +10,7 @@ The repository is maintained by [@GregDog](https://github.com/GregDog). Pull req
 
 ## How to contribute
 
-1. **Check existing work** — search [open issues](https://github.com/GregDog/mcp-server-theopenlane/issues) and open PRs. Issues labeled `good first issue` or `help wanted` are good entry points.
+1. **Check existing work** — search [open issues](https://github.com/GregDog/mcp-server-theopenlane/issues), [Discussions](https://github.com/GregDog/mcp-server-theopenlane/discussions), and open PRs. Issues labeled `good first issue` or `help wanted` are good entry points.
 2. **Fork** the repository on GitHub.
 3. **Clone** your fork and create a branch from `main`:
    ```bash

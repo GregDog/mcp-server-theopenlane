@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
+  - name: Ask a question
+    url: https://github.com/GregDog/mcp-server-theopenlane/discussions
+    about: General questions, setup help, and ideas — use Discussions instead of issues when there is no bug.
   - name: Security vulnerability
     url: https://github.com/GregDog/mcp-server-theopenlane/security/advisories/new
     about: Report a security issue privately — do not open a public issue.
