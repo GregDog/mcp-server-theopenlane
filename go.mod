@@ -3,10 +3,10 @@ module github.com/GregDog/mcp-server-theopenlane
 go 1.27.0
 
 require (
-	github.com/99designs/gqlgen v0.17.94
+	github.com/99designs/gqlgen v0.17.95
 	github.com/modelcontextprotocol/go-sdk v1.7.0
 	github.com/theopenlane/core/common v1.1.0
-	github.com/theopenlane/go-client v0.14.0
+	github.com/theopenlane/go-client v0.14.1
 )
 
 require (
@@ -26,7 +26,7 @@ require (
 	github.com/google/jsonschema-go v0.4.3 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
-	github.com/gqlgo/gqlgenc v0.38.1 // indirect
+	github.com/gqlgo/gqlgenc v0.38.2 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.30.0 // indirect
 	github.com/labstack/echo/v5 v5.3.1 // indirect
 	github.com/mattn/go-colorable v0.1.15 // indirect
@@ -53,7 +53,7 @@ require (
 	github.com/tinylib/msgp v1.6.4 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
-	github.com/vektah/gqlparser/v2 v2.5.36 // indirect
+	github.com/vektah/gqlparser/v2 v2.5.37 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
