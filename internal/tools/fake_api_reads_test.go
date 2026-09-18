@@ -39,6 +39,12 @@ func (f *fakeAPI) GetContacts(context.Context, *int64, *string, *graphclient.Con
 func (f *fakeAPI) GetContactByID(context.Context, string) (*graphclient.GetContactByID, error) {
 	return nil, errors.New("unused")
 }
+func (f *fakeAPI) GetReviews(context.Context, *int64, *string, *graphclient.ReviewWhereInput) (*graphclient.GetReviews, error) {
+	return nil, errors.New("unused")
+}
+func (f *fakeAPI) GetReviewByID(context.Context, string) (*graphclient.GetReviewByID, error) {
+	return nil, errors.New("unused")
+}
 func (f *fakeAPI) GetControlImplementations(context.Context, *int64, *string, *graphclient.ControlImplementationWhereInput) (*graphclient.GetControlImplementations, error) {
 	return nil, errors.New("unused")
 }

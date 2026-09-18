@@ -62,3 +62,7 @@ func taskStatus(value string) *enums.TaskStatus {
 func userStatus(value string) *enums.UserStatus {
 	return enumPtr[enums.UserStatus](value)
 }
+
+func reviewStatus(value string) *enums.ReviewStatus {
+	return enumPtr[enums.ReviewStatus](value)
+}

@@ -11,4 +11,5 @@ var (
 	errUpdateFieldsRequired      = errors.New("at least one field to update is required")
 	errOrganizationRequired      = errors.New("OPENLANE_ORGANIZATION_ID is required to list organization users")
 	errContactIdentifierRequired = errors.New("full_name or email is required")
+	errEntityIDRequired          = errors.New("entity_ids must include at least one vendor ID")
 )

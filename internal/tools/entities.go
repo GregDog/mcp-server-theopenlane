@@ -48,6 +48,7 @@ type entityItem struct {
 	Assets                                *relSummary[idNameRef]  `json:"assets,omitempty"`
 	Risks                                 *relSummary[idNameRef]  `json:"risks,omitempty"`
 	Findings                              *relSummary[findingRef] `json:"findings,omitempty"`
+	Reviews                               *relSummary[reviewRef]  `json:"reviews,omitempty"`
 }
 
 func registerEntities(server *mcp.Server, h *handlers) {
@@ -102,6 +103,9 @@ func (h *handlers) getEntity(ctx context.Context, _ *mcp.CallToolRequest, in get
 		func() { item.Risks = h.fetchRisks(ctx, &graphclient.RiskWhereInput{HasEntitiesWith: entityWhere}) },
 		func() {
 			item.Findings = h.fetchFindings(ctx, &graphclient.FindingWhereInput{HasEntitiesWith: entityWhere})
+		},
+		func() {
+			item.Reviews = h.fetchReviews(ctx, &graphclient.ReviewWhereInput{HasEntitiesWith: entityWhere})
 		},
 	)
 	return nil, item, nil

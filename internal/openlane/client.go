@@ -41,6 +41,10 @@ type GraphAPI interface {
 	GetContacts(ctx context.Context, first *int64, after *string, where *graphclient.ContactWhereInput) (*graphclient.GetContacts, error)
 	GetContactByID(ctx context.Context, id string) (*graphclient.GetContactByID, error)
 	CreateContact(ctx context.Context, input graphclient.CreateContactInput) (*graphclient.CreateContact, error)
+	GetReviews(ctx context.Context, first *int64, after *string, where *graphclient.ReviewWhereInput) (*graphclient.GetReviews, error)
+	GetReviewByID(ctx context.Context, id string) (*graphclient.GetReviewByID, error)
+	CreateReview(ctx context.Context, input graphclient.CreateReviewInput) (*graphclient.CreateReview, error)
+	UpdateReview(ctx context.Context, id string, input graphclient.UpdateReviewInput) (*graphclient.UpdateReview, error)
 	GetControlImplementations(ctx context.Context, first *int64, after *string, where *graphclient.ControlImplementationWhereInput) (*graphclient.GetControlImplementations, error)
 	GetControlImplementationByID(ctx context.Context, id string) (*graphclient.GetControlImplementationByID, error)
 	GetAssessments(ctx context.Context, first *int64, after *string, where *graphclient.AssessmentWhereInput) (*graphclient.GetAssessments, error)
@@ -204,6 +208,22 @@ func (a *api) GetContactByID(ctx context.Context, id string) (*graphclient.GetCo
 
 func (a *api) CreateContact(ctx context.Context, input graphclient.CreateContactInput) (*graphclient.CreateContact, error) {
 	return a.c.CreateContact(ctx, input)
+}
+
+func (a *api) GetReviews(ctx context.Context, first *int64, after *string, where *graphclient.ReviewWhereInput) (*graphclient.GetReviews, error) {
+	return a.c.GetReviews(ctx, first, nil, after, nil, where, nil)
+}
+
+func (a *api) GetReviewByID(ctx context.Context, id string) (*graphclient.GetReviewByID, error) {
+	return a.c.GetReviewByID(ctx, id)
+}
+
+func (a *api) CreateReview(ctx context.Context, input graphclient.CreateReviewInput) (*graphclient.CreateReview, error) {
+	return a.c.CreateReview(ctx, input)
+}
+
+func (a *api) UpdateReview(ctx context.Context, id string, input graphclient.UpdateReviewInput) (*graphclient.UpdateReview, error) {
+	return a.c.UpdateReview(ctx, id, input)
 }
 
 func (a *api) GetControlImplementations(ctx context.Context, first *int64, after *string, where *graphclient.ControlImplementationWhereInput) (*graphclient.GetControlImplementations, error) {

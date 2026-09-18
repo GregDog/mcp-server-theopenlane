@@ -21,15 +21,16 @@ type createRiskInput struct {
 }
 
 type updateRiskInput struct {
-	ID           string   `json:"id" jsonschema:"Risk ID to update."`
-	Name         string   `json:"name,omitempty" jsonschema:"Updated name."`
-	Status       string   `json:"status,omitempty" jsonschema:"Updated risk status enum value."`
-	Impact       string   `json:"impact,omitempty" jsonschema:"Updated impact enum value."`
-	Likelihood   string   `json:"likelihood,omitempty" jsonschema:"Updated likelihood enum value."`
-	Details      string   `json:"details,omitempty" jsonschema:"Updated details."`
-	Mitigation   string   `json:"mitigation,omitempty" jsonschema:"Updated mitigation."`
-	Tags         []string `json:"tags,omitempty" jsonschema:"Replace tags with this list."`
-	AddEntityIDs []string `json:"add_entity_ids,omitempty" jsonschema:"Entity (vendor) IDs to associate with this risk."`
+	ID              string   `json:"id" jsonschema:"Risk ID to update."`
+	Name            string   `json:"name,omitempty" jsonschema:"Updated name."`
+	Status          string   `json:"status,omitempty" jsonschema:"Updated risk status enum value."`
+	Impact          string   `json:"impact,omitempty" jsonschema:"Updated impact enum value."`
+	Likelihood      string   `json:"likelihood,omitempty" jsonschema:"Updated likelihood enum value."`
+	Details         string   `json:"details,omitempty" jsonschema:"Updated details."`
+	Mitigation      string   `json:"mitigation,omitempty" jsonschema:"Updated mitigation."`
+	Tags            []string `json:"tags,omitempty" jsonschema:"Replace tags with this list."`
+	AddEntityIDs    []string `json:"add_entity_ids,omitempty" jsonschema:"Entity (vendor) IDs to associate with this risk."`
+	RemoveEntityIDs []string `json:"remove_entity_ids,omitempty" jsonschema:"Entity (vendor) IDs to unlink from this risk without deleting the risk record."`
 }
 
 func registerWriteRisks(server *mcp.Server, h *handlers) {
@@ -43,7 +44,7 @@ func registerWriteRisks(server *mcp.Server, h *handlers) {
 	addTool(server, &mcp.Tool{
 		Name:        "openlane_risk_update",
 		Title:       "Update an Openlane risk",
-		Description: "Update a risk by ID. Use add_entity_ids to link vendors. Requires write mode.",
+		Description: "Update a risk by ID. Use add_entity_ids to link vendors or remove_entity_ids to unlink without deleting the risk. Requires write mode.",
 		Annotations: writeAnnotations(),
 	}, h.updateRisk)
 }
@@ -111,6 +112,9 @@ func (h *handlers) updateRisk(ctx context.Context, _ *mcp.CallToolRequest, in up
 	if len(in.AddEntityIDs) > 0 {
 		input.AddEntityIDs = in.AddEntityIDs
 	}
+	if len(in.RemoveEntityIDs) > 0 {
+		input.RemoveEntityIDs = in.RemoveEntityIDs
+	}
 	if isEmptyUpdateRisk(input) {
 		return nil, riskItem{}, errUpdateFieldsRequired
 	}
@@ -158,5 +162,6 @@ func isEmptyUpdateRisk(in graphclient.UpdateRiskInput) bool {
 		in.Details == nil &&
 		in.Mitigation == nil &&
 		len(in.Tags) == 0 &&
-		len(in.AddEntityIDs) == 0
+		len(in.AddEntityIDs) == 0 &&
+		len(in.RemoveEntityIDs) == 0
 }

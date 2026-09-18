@@ -234,6 +234,8 @@ Entities represent vendors and other third parties in Openlane. There is no sepa
 | `openlane_contacts_list` | `GetContacts` |
 | `openlane_contact_get` | `GetContactByID` |
 | `openlane_contact_create` | `CreateContact` (optional `entity_ids`) |
+| `openlane_reviews_list` | `GetReviews` (optional `entity_id`) |
+| `openlane_review_get` | `GetReviewByID` |
 
 ## Groups and users
 
@@ -412,8 +414,10 @@ Enabled with `OPENLANE_ALLOW_WRITE=true` or `openlane-mcp serve --allow-write`.
 | `openlane_policy_approve` | `UpdateInternalPolicy` status `APPROVED` (`confirm` required) |
 | `openlane_policy_publish` | `UpdateInternalPolicy` status `PUBLISHED` (`confirm` required) |
 | `openlane_policy_return_to_draft` | `UpdateInternalPolicy` status `DRAFT` (`confirm` required) |
-| `openlane_risk_create` | `CreateRisk` |
-| `openlane_risk_update` | `UpdateRisk` |
+| `openlane_risk_create` | `CreateRisk` (optional `entity_ids`) |
+| `openlane_risk_update` | `UpdateRisk` (`add_entity_ids`, `remove_entity_ids`) |
+| `openlane_vendor_risk_review_create` | `CreateReview` (vendor Risk Review title/body + `entity_ids`) |
+| `openlane_vendor_risk_review_update` | `UpdateReview` |
 | `openlane_task_create` | `CreateTask` |
 | `openlane_task_update` | `UpdateTask` |
 | `openlane_entity_create` | Custom GraphQL `createEntity` (optional `logo` base64 upload or `logo_remote_url`) |

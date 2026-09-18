@@ -53,6 +53,23 @@ func buildEntityWhere(in entityListInput) *graphclient.EntityWhereInput {
 	return &w
 }
 
+func buildReviewWhere(in reviewListInput) *graphclient.ReviewWhereInput {
+	var w graphclient.ReviewWhereInput
+	has := false
+	if s := strings.TrimSpace(in.EntityID); s != "" {
+		w.HasEntitiesWith = []*graphclient.EntityWhereInput{{ID: &s}}
+		has = true
+	}
+	if s := strings.TrimSpace(in.Title); s != "" {
+		w.TitleContainsFold = &s
+		has = true
+	}
+	if !has {
+		return nil
+	}
+	return &w
+}
+
 func buildRiskWhere(in riskListInput) *graphclient.RiskWhereInput {
 	var w graphclient.RiskWhereInput
 	has := false

@@ -47,8 +47,15 @@ func (f *fakeAPI) CreateRisk(_ context.Context, input graphclient.CreateRiskInpu
 		},
 	}, nil
 }
-func (f *fakeAPI) UpdateRisk(context.Context, string, graphclient.UpdateRiskInput) (*graphclient.UpdateRisk, error) {
-	return nil, errors.New("unused")
+func (f *fakeAPI) UpdateRisk(_ context.Context, id string, _ graphclient.UpdateRiskInput) (*graphclient.UpdateRisk, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	return &graphclient.UpdateRisk{
+		UpdateRisk: graphclient.UpdateRisk_UpdateRisk{
+			Risk: graphclient.UpdateRisk_UpdateRisk_Risk{ID: id, Name: "updated"},
+		},
+	}, nil
 }
 func (f *fakeAPI) CreateTask(context.Context, graphclient.CreateTaskInput) (*graphclient.CreateTask, error) {
 	return nil, errors.New("unused")
@@ -70,6 +77,40 @@ func (f *fakeAPI) DeleteRisk(context.Context, string) (string, error) {
 }
 func (f *fakeAPI) DeleteTask(context.Context, string) (string, error) {
 	return "", errors.New("unused")
+}
+func (f *fakeAPI) CreateReview(_ context.Context, input graphclient.CreateReviewInput) (*graphclient.CreateReview, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	return &graphclient.CreateReview{
+		CreateReview: graphclient.CreateReview_CreateReview{
+			Review: graphclient.CreateReview_CreateReview_Review{
+				ID:      "review_1",
+				Title:   input.Title,
+				Details: input.Details,
+				Summary: input.Summary,
+			},
+		},
+	}, nil
+}
+func (f *fakeAPI) UpdateReview(_ context.Context, id string, input graphclient.UpdateReviewInput) (*graphclient.UpdateReview, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	title := "updated"
+	if input.Title != nil {
+		title = *input.Title
+	}
+	return &graphclient.UpdateReview{
+		UpdateReview: graphclient.UpdateReview_UpdateReview{
+			Review: graphclient.UpdateReview_UpdateReview_Review{
+				ID:      id,
+				Title:   title,
+				Details: input.Details,
+				Summary: input.Summary,
+			},
+		},
+	}, nil
 }
 func (f *fakeAPI) CreateContact(_ context.Context, input graphclient.CreateContactInput) (*graphclient.CreateContact, error) {
 	if f.err != nil {

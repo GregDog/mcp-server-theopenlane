@@ -84,6 +84,8 @@ type updateEntityInput struct {
 	InternalOwnerUserID   string           `json:"internal_owner_user_id,omitempty" jsonschema:"Updated internal owner user ID."`
 	InternalOwnerGroupID  string           `json:"internal_owner_group_id,omitempty" jsonschema:"Updated internal owner group ID."`
 	AddContactIDs         []string         `json:"add_contact_ids,omitempty" jsonschema:"Contact IDs to associate with this entity (vendor)."`
+	AddReviewIDs          []string         `json:"add_review_ids,omitempty" jsonschema:"Review IDs to associate with this entity (vendor), including Risk Reviews."`
+	RemoveReviewIDs       []string         `json:"remove_review_ids,omitempty" jsonschema:"Review IDs to unlink from this entity (vendor)."`
 	LogoRemoteURL         string           `json:"logo_remote_url,omitempty" jsonschema:"Updated remote logo URL."`
 	Logo                  *entityLogoInput `json:"logo,omitempty" jsonschema:"Optional logo file uploaded as base64."`
 }
@@ -333,6 +335,12 @@ func applyUpdateEntityFields(input *graphclient.UpdateEntityInput, in updateEnti
 	if len(in.AddContactIDs) > 0 {
 		input.AddContactIDs = in.AddContactIDs
 	}
+	if len(in.AddReviewIDs) > 0 {
+		input.AddReviewIDs = in.AddReviewIDs
+	}
+	if len(in.RemoveReviewIDs) > 0 {
+		input.RemoveReviewIDs = in.RemoveReviewIDs
+	}
 	return nil
 }
 
@@ -404,5 +412,7 @@ func isEmptyUpdateEntity(in graphclient.UpdateEntityInput) bool {
 		in.InternalOwnerUserID == nil &&
 		in.InternalOwnerGroupID == nil &&
 		in.LogoRemoteURL == nil &&
-		len(in.AddContactIDs) == 0
+		len(in.AddContactIDs) == 0 &&
+		len(in.AddReviewIDs) == 0 &&
+		len(in.RemoveReviewIDs) == 0
 }

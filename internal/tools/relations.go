@@ -76,6 +76,13 @@ type assessmentResponseRef struct {
 	Due    string `json:"due_date,omitempty"`
 }
 
+type reviewRef struct {
+	ID      string `json:"id"`
+	Title   string `json:"title,omitempty"`
+	Summary string `json:"summary,omitempty"`
+	State   string `json:"state,omitempty"`
+}
+
 type vulnerabilityRef struct {
 	ID          string `json:"id"`
 	DisplayName string `json:"display_name,omitempty"`
@@ -150,6 +157,28 @@ func (h *handlers) fetchRisks(ctx context.Context, where *graphclient.RiskWhereI
 		items = append(items, idNameRef{ID: n.ID, Name: n.Name, Status: openlane.Format(n.Status)})
 	}
 	return &relSummary[idNameRef]{Count: resp.Risks.TotalCount, Items: items}
+}
+
+func (h *handlers) fetchReviews(ctx context.Context, where *graphclient.ReviewWhereInput) *relSummary[reviewRef] {
+	first := relFirst()
+	resp, err := h.api.GetReviews(ctx, &first, nil, where)
+	if err != nil {
+		return nil
+	}
+	items := make([]reviewRef, 0, len(resp.Reviews.Edges))
+	for _, e := range resp.Reviews.Edges {
+		if e == nil || e.Node == nil {
+			continue
+		}
+		n := e.Node
+		items = append(items, reviewRef{
+			ID:      n.ID,
+			Title:   n.Title,
+			Summary: openlane.Deref(n.Summary),
+			State:   openlane.Deref(n.State),
+		})
+	}
+	return &relSummary[reviewRef]{Count: resp.Reviews.TotalCount, Items: items}
 }
 
 func (h *handlers) fetchTasks(ctx context.Context, where *graphclient.TaskWhereInput) *relSummary[taskRef] {
