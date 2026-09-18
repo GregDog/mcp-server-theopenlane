@@ -14,8 +14,8 @@ Configuration is environment-based.
 | `OPENLANE_MCP_HTTP_ADDR` | no | `127.0.0.1:8090` | Loopback listen address when `OPENLANE_MCP_TRANSPORT=http` |
 | `OPENLANE_MCP_HTTP_JSON` | no | `false` | Use `application/json` responses for HTTP transport |
 | `OPENLANE_MCP_HTTP_MAX_BODY_BYTES` | no | `33554432` | Max HTTP request body size (32 MiB) |
-| `OPENLANE_MCP_MAX_UPLOAD_BYTES` | no | `10485760` | Max decoded evidence upload per file (10 MiB) |
-| `OPENLANE_MCP_UPLOAD_TIMEOUT` | no | `2m` | Openlane API timeout for evidence uploads |
+| `OPENLANE_MCP_MAX_UPLOAD_BYTES` | no | `10485760` | Max decoded evidence or entity logo upload per file (10 MiB) |
+| `OPENLANE_MCP_UPLOAD_TIMEOUT` | no | `2m` | Openlane API timeout for evidence and entity logo uploads |
 
 You can also pass `--allow-write`, `--allow-delete`, `--transport`, `--http-addr`, or `--http-json` to `openlane-mcp serve`. Write and delete are independent; enabling writes does not enable deletes.
 

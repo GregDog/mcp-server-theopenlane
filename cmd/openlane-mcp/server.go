@@ -18,6 +18,7 @@ func newMCPServer(cfg config.Config, client openlane.GraphAPI) *mcp.Server {
 		AllowWrite:     cfg.AllowWrite,
 		AllowDelete:    cfg.AllowDelete,
 		MaxUploadBytes: cfg.MaxUploadBytes,
+		OrganizationID: cfg.OrganizationID,
 	})
 	return server
 }

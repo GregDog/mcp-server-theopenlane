@@ -4,6 +4,16 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Entity (vendor) write tools: `openlane_entity_create` and `openlane_entity_update` (opt-in via `OPENLANE_ALLOW_WRITE`)
+
+### Fixed
+
+- `openlane_users_list` / `openlane_user_get` now resolve organization members via `GetOrgMembersByOrgID` instead of the global `users` query (which returns empty results for org API tokens)
+- Entity logo upload via base64 `logo` object or `logo_remote_url` (custom GraphQL; go-client v0.14.0 omits `logoFile` on entity mutations)
+- `logo_remote_url` and `logo_file_id` on `openlane_entity_get` via custom GraphQL `EntityDetail` query
+
 ## [0.5.2] - 2026-09-03
 
 ### Fixed

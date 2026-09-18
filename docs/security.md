@@ -38,10 +38,10 @@ The Streamable HTTP transport (`OPENLANE_MCP_TRANSPORT=http`) is intended for **
 
 ## Request bounds
 
-- HTTP timeout: 30 seconds (2 minutes for evidence uploads)
+- HTTP timeout: 30 seconds (2 minutes for evidence and entity logo uploads)
 - Default page size: 20
 - Maximum page size: 50
-- Default evidence upload size: 10 MiB decoded per file
+- Default evidence and entity logo upload size: 10 MiB decoded per file
 - No automatic retries
 
 ## Reporting vulnerabilities

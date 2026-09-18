@@ -286,10 +286,23 @@ func TestBuildGroupWhere(t *testing.T) {
 	}
 }
 
-func TestBuildUserWhere(t *testing.T) {
-	where := buildUserWhere(userListInput{Email: "a@example.com"})
-	if where == nil || where.EmailContainsFold == nil {
-		t.Fatalf("got %+v", where)
+func TestBuildOrgMemberWhere(t *testing.T) {
+	where, err := buildOrgMemberWhere("01ORG", userListInput{Email: "a@example.com"})
+	if err != nil {
+		t.Fatalf("unexpected err: %v", err)
+	}
+	if where == nil || where.OrganizationID == nil || *where.OrganizationID != "01ORG" {
+		t.Fatalf("org: %+v", where)
+	}
+	if len(where.HasUserWith) != 1 || where.HasUserWith[0].EmailContainsFold == nil {
+		t.Fatalf("user filter: %+v", where)
+	}
+}
+
+func TestBuildOrgMemberWhereRequiresOrg(t *testing.T) {
+	_, err := buildOrgMemberWhere("", userListInput{})
+	if err != errOrganizationRequired {
+		t.Fatalf("got %v", err)
 	}
 }
 

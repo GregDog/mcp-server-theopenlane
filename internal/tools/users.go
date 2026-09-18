@@ -24,42 +24,66 @@ type userItem struct {
 	Email       string `json:"email,omitempty"`
 	FirstName   string `json:"first_name,omitempty"`
 	LastName    string `json:"last_name,omitempty"`
+	OrgRole     string `json:"org_role,omitempty"`
 }
 
 func registerUsers(server *mcp.Server, h *handlers) {
 	addTool(server, &mcp.Tool{
 		Name:        "openlane_users_list",
 		Title:       "List Openlane users",
-		Description: "List users in the configured organization. Filter by name or email. Use to resolve a person to a user ID before creating workflows or reassigning assignments.",
+		Description: "List users who are members of the configured organization. Filter by name or email. Use to resolve a person to a user ID before creating workflows, assigning vendor owners, or reassigning assignments.",
 		Annotations: readOnly(),
 	}, h.listUsers)
 
 	addTool(server, &mcp.Tool{
 		Name:        "openlane_user_get",
 		Title:       "Get an Openlane user",
-		Description: "Get a user by ID.",
+		Description: "Get an organization member by user ID.",
 		Annotations: readOnly(),
 	}, h.getUser)
 }
 
 func (h *handlers) listUsers(ctx context.Context, _ *mcp.CallToolRequest, in userListInput) (*mcp.CallToolResult, openlane.Page[userItem], error) {
-	first, after := pageArgs(in.Limit, in.Cursor)
-	resp, err := h.api.GetUsers(ctx, &first, after, buildUserWhere(in))
+	where, err := buildOrgMemberWhere(h.organizationID, in)
+	if err != nil {
+		return nil, openlane.Page[userItem]{}, err
+	}
+	resp, err := h.api.GetOrgMembers(ctx, where)
 	if err != nil {
 		return nil, openlane.Page[userItem]{}, openlane.APIError(err)
 	}
-	items := make([]userItem, 0, len(resp.Users.Edges))
-	for _, e := range resp.Users.Edges {
+
+	all := make([]userItem, 0, len(resp.OrgMemberships.Edges))
+	for _, e := range resp.OrgMemberships.Edges {
 		if e == nil || e.Node == nil {
 			continue
 		}
-		items = append(items, mapUserNode(*e.Node))
+		all = append(all, mapOrgMemberUser(*e.Node))
 	}
+
+	limit := openlane.ClampLimit(in.Limit)
+	start := 0
+	if c := strings.TrimSpace(in.Cursor); c != "" {
+		if off, err := parseOffsetCursor(c); err == nil && off >= 0 {
+			start = off
+		}
+	}
+	end := start + int(limit)
+	if end > len(all) {
+		end = len(all)
+	}
+	items := all[start:end]
+	hasMore := end < len(all)
+	var nextCursor *string
+	if hasMore {
+		nextCursor = openlane.CursorPtr(formatOffsetCursor(end))
+	}
+
 	return nil, openlane.Page[userItem]{
 		Items:      items,
-		NextCursor: resp.Users.PageInfo.EndCursor,
-		HasMore:    resp.Users.PageInfo.HasNextPage,
-		TotalCount: resp.Users.TotalCount,
+		NextCursor: nextCursor,
+		HasMore:    hasMore,
+		TotalCount: int64(len(all)),
 	}, nil
 }
 
@@ -67,53 +91,68 @@ func (h *handlers) getUser(ctx context.Context, _ *mcp.CallToolRequest, in getIn
 	if in.ID == "" {
 		return nil, userItem{}, errIDRequired
 	}
-	resp, err := h.api.GetUserByID(ctx, in.ID)
+	if strings.TrimSpace(h.organizationID) == "" {
+		return nil, userItem{}, errOrganizationRequired
+	}
+	orgID := h.organizationID
+	resp, err := h.api.GetOrgMembers(ctx, &graphclient.OrgMembershipWhereInput{
+		OrganizationID: &orgID,
+		UserID:         &in.ID,
+	})
 	if err != nil {
 		return nil, userItem{}, openlane.APIError(err)
 	}
-	u := resp.User
-	return nil, userItem{
+	for _, e := range resp.OrgMemberships.Edges {
+		if e == nil || e.Node == nil {
+			continue
+		}
+		return nil, mapOrgMemberUser(*e.Node), nil
+	}
+	return nil, userItem{}, fmt.Errorf("no organization user matched id %q", in.ID)
+}
+
+func mapOrgMemberUser(n graphclient.GetOrgMembersByOrgID_OrgMemberships_Edges_Node) userItem {
+	u := n.User
+	return userItem{
 		ID:          u.ID,
-		DisplayID:   u.DisplayID,
 		DisplayName: u.DisplayName,
 		Email:       u.Email,
 		FirstName:   openlane.Deref(u.FirstName),
 		LastName:    openlane.Deref(u.LastName),
-	}, nil
-}
-
-func mapUserNode(n graphclient.GetUsers_Users_Edges_Node) userItem {
-	return userItem{
-		ID:          n.ID,
-		DisplayID:   n.DisplayID,
-		DisplayName: n.DisplayName,
-		Email:       n.Email,
-		FirstName:   openlane.Deref(n.FirstName),
-		LastName:    openlane.Deref(n.LastName),
+		OrgRole:     openlane.Format(n.Role),
 	}
 }
 
-func buildUserWhere(in userListInput) *graphclient.UserWhereInput {
+func buildOrgMemberWhere(orgID string, in userListInput) (*graphclient.OrgMembershipWhereInput, error) {
+	orgID = strings.TrimSpace(orgID)
+	if orgID == "" {
+		return nil, errOrganizationRequired
+	}
+	where := &graphclient.OrgMembershipWhereInput{OrganizationID: &orgID}
+
 	email := strings.TrimSpace(in.Email)
 	name := strings.TrimSpace(in.Name)
 	if email == "" && name == "" {
-		return nil
+		return where, nil
 	}
-	var or []*graphclient.UserWhereInput
+
+	var userOr []*graphclient.UserWhereInput
 	if email != "" {
-		or = append(or, &graphclient.UserWhereInput{EmailContainsFold: &email})
+		userOr = append(userOr, &graphclient.UserWhereInput{EmailContainsFold: &email})
 	}
 	if name != "" {
-		or = append(or,
+		userOr = append(userOr,
 			&graphclient.UserWhereInput{DisplayNameContainsFold: &name},
 			&graphclient.UserWhereInput{FirstNameContainsFold: &name},
 			&graphclient.UserWhereInput{LastNameContainsFold: &name},
 		)
 	}
-	if len(or) == 1 {
-		return or[0]
+	userWhere := userOr[0]
+	if len(userOr) > 1 {
+		userWhere = &graphclient.UserWhereInput{Or: userOr}
 	}
-	return &graphclient.UserWhereInput{Or: or}
+	where.HasUserWith = []*graphclient.UserWhereInput{userWhere}
+	return where, nil
 }
 
 func (h *handlers) resolveUserID(ctx context.Context, nameEmailOrID string) (string, error) {
@@ -130,25 +169,28 @@ func (h *handlers) resolveUserID(ctx context.Context, nameEmailOrID string) (str
 	} else {
 		in.Name = s
 	}
-	first := int64(10)
-	resp, err := h.api.GetUsers(ctx, &first, nil, buildUserWhere(in))
+	where, err := buildOrgMemberWhere(h.organizationID, in)
+	if err != nil {
+		return "", err
+	}
+	resp, err := h.api.GetOrgMembers(ctx, where)
 	if err != nil {
 		return "", openlane.APIError(err)
 	}
 	var matches []string
-	for _, e := range resp.Users.Edges {
+	for _, e := range resp.OrgMemberships.Edges {
 		if e == nil || e.Node == nil {
 			continue
 		}
-		n := e.Node
-		if strings.EqualFold(n.Email, s) || strings.EqualFold(n.DisplayName, s) {
-			matches = append(matches, n.ID)
+		u := e.Node.User
+		if strings.EqualFold(u.Email, s) || strings.EqualFold(u.DisplayName, s) {
+			matches = append(matches, u.ID)
 		}
 	}
 	if len(matches) == 0 {
-		for _, e := range resp.Users.Edges {
-			if e != nil && e.Node != nil {
-				matches = append(matches, e.Node.ID)
+		for _, e := range resp.OrgMemberships.Edges {
+			if e != nil && e.Node != nil && e.Node.User.ID != "" {
+				matches = append(matches, e.Node.User.ID)
 			}
 		}
 	}
@@ -160,4 +202,18 @@ func (h *handlers) resolveUserID(ctx context.Context, nameEmailOrID string) (str
 	default:
 		return "", fmt.Errorf("multiple users matched %q; use an id", s)
 	}
+}
+
+func parseOffsetCursor(cursor string) (int, error) {
+	const prefix = "offset:"
+	if !strings.HasPrefix(cursor, prefix) {
+		return 0, fmt.Errorf("invalid cursor")
+	}
+	var off int
+	_, err := fmt.Sscanf(cursor, prefix+"%d", &off)
+	return off, err
+}
+
+func formatOffsetCursor(offset int) string {
+	return fmt.Sprintf("offset:%d", offset)
 }

@@ -6,6 +6,8 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/theopenlane/go-client/graphclient"
+
+	"github.com/GregDog/mcp-server-theopenlane/internal/openlane"
 )
 
 func (f *fakeAPI) CreateControl(context.Context, graphclient.CreateControlInput) (*graphclient.CreateControl, error) {
@@ -58,4 +60,23 @@ func (f *fakeAPI) DeleteRisk(context.Context, string) (string, error) {
 }
 func (f *fakeAPI) DeleteTask(context.Context, string) (string, error) {
 	return "", errors.New("unused")
+}
+func (f *fakeAPI) CreateEntity(_ context.Context, input graphclient.CreateEntityInput, _ *string, _ *graphql.Upload) (*openlane.EntityDetail, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	name := "created"
+	if input.Name != nil {
+		name = *input.Name
+	}
+	return &openlane.EntityDetail{ID: "ent_1", Name: &name}, nil
+}
+func (f *fakeAPI) UpdateEntity(_ context.Context, id string, _ graphclient.UpdateEntityInput, _ *graphql.Upload) (*openlane.EntityDetail, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	if f.entity != nil {
+		return f.entity, nil
+	}
+	return &openlane.EntityDetail{ID: id, Name: strPtr("updated")}, nil
 }

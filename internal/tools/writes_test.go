@@ -37,4 +37,14 @@ func TestWriteValidationRequiresFields(t *testing.T) {
 	if err != errUpdateFieldsRequired {
 		t.Fatalf("update control: got %v", err)
 	}
+
+	_, _, err = h.createEntity(context.Background(), nil, createEntityInput{})
+	if err != errNameRequired {
+		t.Fatalf("create entity: got %v", err)
+	}
+
+	_, _, err = h.updateEntity(context.Background(), nil, updateEntityInput{ID: "ent_1"})
+	if err != errUpdateFieldsRequired {
+		t.Fatalf("update entity: got %v", err)
+	}
 }

@@ -65,6 +65,8 @@ Example prompts:
 - "Get entity `<id>` — SOC 2, SSO/MFA, contract dates, and owner"
 - "Get control `<id>` — what evidence and implementations support it?"
 - "Create evidence named MCP test with a text file" (requires write mode; see evidence uploads below)
+- "Create vendor Acme Corp with tier HIGH" (requires write mode; `openlane_entity_create`)
+- "Upload a logo for entity `<id>`" (requires write mode; `openlane_entity_update` with `logo` base64)
 - "Delete evidence `<id>`" (requires delete mode)
 
 ## Compliance context manual testing
@@ -123,9 +125,22 @@ bash scripts/mcp-http.sh
 
 HTTP mode has no built-in MCP authentication. Do not expose it directly to the public internet. Use a trusted reverse proxy for remote deployment. See [security.md](security.md).
 
-## Evidence upload testing
+## Evidence and entity logo upload testing
 
-Evidence file uploads are tested via MCP write tools (`openlane_evidence_create` / `openlane_evidence_update`) with a `files[]` array:
+Evidence file uploads are tested via MCP write tools (`openlane_evidence_create` / `openlane_evidence_update`) with a `files[]` array. Entity logos use `openlane_entity_create` / `openlane_entity_update` with a single `logo` object or `logo_remote_url`:
+
+```json
+{
+  "id": "01…",
+  "logo": {
+    "filename": "acme.png",
+    "content_type": "image/png",
+    "content_base64": "..."
+  }
+}
+```
+
+Evidence uploads (`files[]` array):
 
 ```json
 {
@@ -144,9 +159,9 @@ MCP read tools return `file_ids` but not presigned download URLs. Verify downloa
 | Mode | Count |
 | --- | --- |
 | Read (always on) | 40 |
-| Write (opt-in) | 20 |
+| Write (opt-in) | 22 |
 | Delete (opt-in) | 6 |
-| **Total** | **66** |
+| **Total** | **68** |
 
 See [tools.md](tools.md) for the full mapping to Openlane client methods.
 

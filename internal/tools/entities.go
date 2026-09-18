@@ -42,6 +42,8 @@ type entityItem struct {
 	InternalOwner                         string                  `json:"internal_owner,omitempty"`
 	InternalOwnerUserID                   string                  `json:"internal_owner_user_id,omitempty"`
 	InternalOwnerGroupID                  string                  `json:"internal_owner_group_id,omitempty"`
+	LogoRemoteURL                         string                  `json:"logo_remote_url,omitempty"`
+	LogoFileID                            string                  `json:"logo_file_id,omitempty"`
 	Tags                                  []string                `json:"tags,omitempty"`
 	Assets                                *relSummary[idNameRef]  `json:"assets,omitempty"`
 	Risks                                 *relSummary[idNameRef]  `json:"risks,omitempty"`
@@ -89,11 +91,11 @@ func (h *handlers) getEntity(ctx context.Context, _ *mcp.CallToolRequest, in get
 	if in.ID == "" {
 		return nil, entityItem{}, errIDRequired
 	}
-	resp, err := h.api.GetEntityByID(ctx, in.ID)
+	detail, err := h.api.GetEntityDetail(ctx, in.ID)
 	if err != nil {
 		return nil, entityItem{}, openlane.APIError(err)
 	}
-	item := mapGetEntity(resp.Entity)
+	item := mapEntityDetail(*detail)
 	entityWhere := []*graphclient.EntityWhereInput{{ID: &in.ID}}
 	runRelJobs(
 		func() { item.Assets = h.fetchAssets(ctx, &graphclient.AssetWhereInput{HasEntitiesWith: entityWhere}) },
@@ -160,6 +162,46 @@ func mapGetEntity(e graphclient.GetEntityByID_Entity) entityItem {
 		InternalOwner:                         openlane.Deref(e.InternalOwner),
 		InternalOwnerUserID:                   openlane.Deref(e.InternalOwnerUserID),
 		InternalOwnerGroupID:                  openlane.Deref(e.InternalOwnerGroupID),
+		Tags:                                  e.Tags,
+	}
+}
+
+func mapEntityDetail(e openlane.EntityDetail) entityItem {
+	return entityItem{
+		ID:                                    e.ID,
+		Name:                                  openlane.Deref(e.Name),
+		DisplayName:                           openlane.Deref(e.DisplayName),
+		Description:                           openlane.Deref(e.Description),
+		EntityTypeID:                          openlane.Deref(e.EntityTypeID),
+		EntitySourceTypeName:                  openlane.Deref(e.EntitySourceTypeName),
+		EntityRelationshipStateName:           openlane.Deref(e.EntityRelationshipStateName),
+		EntitySecurityQuestionnaireStatusName: openlane.Deref(e.EntitySecurityQuestionnaireStatusName),
+		EnvironmentName:                       openlane.Deref(e.EnvironmentName),
+		Tier:                                  openlane.Format(e.Tier),
+		RiskRating:                            openlane.Deref(e.RiskRating),
+		RiskScore:                             e.RiskScore,
+		ApprovedForUse:                        e.ApprovedForUse,
+		HasSoc2:                               e.HasSoc2,
+		Soc2PeriodEnd:                         openlane.Format(e.Soc2PeriodEnd),
+		SsoEnforced:                           e.SsoEnforced,
+		MfaSupported:                          e.MfaSupported,
+		MfaEnforced:                           e.MfaEnforced,
+		LastReviewedAt:                        openlane.Format(e.LastReviewedAt),
+		NextReviewAt:                          openlane.Format(e.NextReviewAt),
+		ContractStartDate:                     openlane.Format(e.ContractStartDate),
+		ContractEndDate:                       openlane.Format(e.ContractEndDate),
+		ContractRenewalAt:                     openlane.Format(e.ContractRenewalAt),
+		AutoRenews:                            e.AutoRenews,
+		TerminationNoticeDays:                 e.TerminationNoticeDays,
+		AnnualSpend:                           e.AnnualSpend,
+		SpendCurrency:                         openlane.Deref(e.SpendCurrency),
+		BillingModel:                          openlane.Deref(e.BillingModel),
+		RenewalRisk:                           openlane.Deref(e.RenewalRisk),
+		InternalOwner:                         openlane.Deref(e.InternalOwner),
+		InternalOwnerUserID:                   openlane.Deref(e.InternalOwnerUserID),
+		InternalOwnerGroupID:                  openlane.Deref(e.InternalOwnerGroupID),
+		LogoRemoteURL:                         openlane.Deref(e.LogoRemoteURL),
+		LogoFileID:                            openlane.Deref(e.LogoFileID),
 		Tags:                                  e.Tags,
 	}
 }

@@ -200,6 +200,7 @@ Write tools (require `OPENLANE_ALLOW_WRITE=true` or `--allow-write`):
 | `openlane_policy_submit_for_approval` / `openlane_policy_approve` / `openlane_policy_publish` / `openlane_policy_return_to_draft` | Native InternalPolicy status transitions (`confirm` required) |
 | `openlane_risk_create` / `openlane_risk_update` | Create or update a risk |
 | `openlane_task_create` / `openlane_task_update` | Create or update a task |
+| `openlane_entity_create` / `openlane_entity_update` | Create or update an entity (vendor); optional base64 logo upload or `logo_remote_url` |
 | `openlane_workflow_create` / `openlane_workflow_update` | Create or update a WorkflowDefinition (`confirm` required) |
 | `openlane_workflow_assignment_approve` / `openlane_workflow_assignment_reject` | Approve or reject a WorkflowAssignment (`confirm` required) |
 | `openlane_workflow_assignment_request_changes` / `openlane_workflow_assignment_reassign` | Request changes or reassign an assignment (`confirm` required) |

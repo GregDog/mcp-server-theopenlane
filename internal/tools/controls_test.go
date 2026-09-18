@@ -20,12 +20,14 @@ type fakeAPI struct {
 	groups     *graphclient.GetGroups
 	group      *graphclient.GetGroupByID
 	users      *graphclient.GetUsers
+	orgMembers *graphclient.GetOrgMembersByOrgID
 	user       *graphclient.GetUserByID
 	workflow   *graphclient.GetWorkflowDefinitionByID
 	createdWF  *graphclient.CreateWorkflowDefinition
 	metadata   *openlane.WorkflowMetadata
 	assignment *openlane.WorkflowAssignmentDetail
 	deletedID  string
+	entity     *openlane.EntityDetail
 }
 
 func (f *fakeAPI) GetControls(ctx context.Context, first *int64, after *string, where *graphclient.ControlWhereInput) (*graphclient.GetControls, error) {

@@ -8,7 +8,12 @@ import (
 
 // Register adds Openlane MCP tools to the server.
 func Register(server *mcp.Server, api openlane.GraphAPI, opts Options) {
-	h := &handlers{api: api, allowWrite: opts.AllowWrite, maxUploadBytes: opts.MaxUploadBytes}
+	h := &handlers{
+		api:            api,
+		allowWrite:     opts.AllowWrite,
+		maxUploadBytes: opts.MaxUploadBytes,
+		organizationID: opts.OrganizationID,
+	}
 	registerControls(server, h)
 	registerPrograms(server, h)
 	registerEvidence(server, h)
@@ -34,6 +39,7 @@ func Register(server *mcp.Server, api openlane.GraphAPI, opts Options) {
 		registerWritePolicies(server, h)
 		registerWriteRisks(server, h)
 		registerWriteTasks(server, h)
+		registerWriteEntities(server, h)
 		registerWriteWorkflows(server, h)
 		registerWriteWorkflowAssignments(server, h)
 		registerPolicyLifecycle(server, h)
@@ -47,4 +53,5 @@ type handlers struct {
 	api            openlane.GraphAPI
 	allowWrite     bool
 	maxUploadBytes int64
+	organizationID string
 }

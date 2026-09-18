@@ -9,4 +9,5 @@ var (
 	errTitleRequired        = errors.New("title is required")
 	errRefCodeRequired      = errors.New("ref_code is required")
 	errUpdateFieldsRequired = errors.New("at least one field to update is required")
+	errOrganizationRequired = errors.New("OPENLANE_ORGANIZATION_ID is required to list organization users")
 )

@@ -201,7 +201,7 @@ Implementation get responses include control/subcontrol `ref_code` values (not c
 | Tool | Openlane client |
 | --- | --- |
 | `openlane_entities_list` | `GetEntities` |
-| `openlane_entity_get` | `GetEntityByID` + bounded assets/risks/findings |
+| `openlane_entity_get` | Custom GraphQL `EntityDetail` + bounded assets/risks/findings |
 
 Entities represent vendors and other third parties in Openlane. There is no separate vendor API in the current Go client.
 
@@ -218,7 +218,7 @@ Entities represent vendors and other third parties in Openlane. There is no sepa
 | `sso_enforced` | `SsoEnforced` |
 | `mfa_enforced` | `MfaEnforced` |
 
-`openlane_entity_get` exposes vendor/security/commercial fields (SOC 2, SSO/MFA, contract, spend, reviews, owner) and bounded relationship summaries.
+`openlane_entity_get` exposes vendor/security/commercial fields (SOC 2, SSO/MFA, contract, spend, reviews, owner), `logo_remote_url` / `logo_file_id`, and bounded relationship summaries.
 
 ## Assets
 
@@ -242,14 +242,16 @@ Lookup tools for name→ID resolution when authoring workflows or reassigning as
 | --- | --- |
 | `openlane_groups_list` | `GetGroups` |
 | `openlane_group_get` | `GetGroupByID` |
-| `openlane_users_list` | `GetUsers` |
-| `openlane_user_get` | `GetUserByID` |
+| `openlane_users_list` | `GetOrgMembersByOrgID` (organization members; not global `users`) |
+| `openlane_user_get` | `GetOrgMembersByOrgID` filtered by `userID` |
 
 `openlane_groups_list` filters:
 
 | Field | Maps to |
 | --- | --- |
 | `name` | `NameContainsFold` **or** `DisplayNameContainsFold` |
+
+`openlane_users_list` requires `OPENLANE_ORGANIZATION_ID` and lists **organization members** (the same people shown in the Openlane org user directory). The global `users` GraphQL connection returns an empty list for org API tokens and is not used.
 
 `openlane_users_list` filters:
 
@@ -413,6 +415,8 @@ Enabled with `OPENLANE_ALLOW_WRITE=true` or `openlane-mcp serve --allow-write`.
 | `openlane_risk_update` | `UpdateRisk` |
 | `openlane_task_create` | `CreateTask` |
 | `openlane_task_update` | `UpdateTask` |
+| `openlane_entity_create` | Custom GraphQL `createEntity` (optional `logo` base64 upload or `logo_remote_url`) |
+| `openlane_entity_update` | Custom GraphQL `updateEntity` (optional `logo` base64 upload or `logo_remote_url`) |
 | `openlane_workflow_create` | `CreateWorkflowDefinition` (`confirm` required; validated against `workflowMetadata` + copied JSON schema) |
 | `openlane_workflow_update` | `UpdateWorkflowDefinition` Get-then-patch (`confirm` required) |
 | `openlane_workflow_assignment_approve` | `ApproveWorkflowAssignment` (`confirm` required) |
@@ -420,7 +424,9 @@ Enabled with `OPENLANE_ALLOW_WRITE=true` or `openlane-mcp serve --allow-write`.
 | `openlane_workflow_assignment_request_changes` | Custom GraphQL `requestChangesWorkflowAssignment` (`confirm` required) |
 | `openlane_workflow_assignment_reassign` | Custom GraphQL `reassignWorkflowAssignment` (`confirm` required) |
 
-Create tools require the Openlane mandatory fields (`ref_code` for controls, `name` for evidence/policies/risks, `title` for tasks). Update tools require `id` and at least one field to change.
+Create tools require the Openlane mandatory fields (`ref_code` for controls, `name` for evidence/policies/risks/entities, `title` for tasks). Update tools require `id` and at least one field to change (entity updates may supply only a `logo` upload).
+
+Entity logo uploads use a single `logo` object with `filename`, optional `content_type`, and `content_base64`, or `logo_remote_url` for a remote image URL. The go-client v0.14.0 `CreateEntity` / `UpdateEntity` mutations omit the schema `logoFile` argument; MCP uses custom GraphQL for file uploads (same pattern as workflow assignment mutations).
 
 Workflow and native policy lifecycle writes additionally require `confirm: true`. If `confirm` is false or omitted, the tool returns a before/after (or current/requested status) preview with `error: confirmation required` and does not mutate.
 
@@ -454,7 +460,7 @@ Approve a workflow assignment:
 {"name": "openlane_workflow_assignment_approve", "arguments": {"id": "01…", "confirm": true}}
 ```
 
-Evidence file uploads use `files[]` objects with `filename`, optional `content_type`, and `content_base64`. Default max decoded size is 10 MiB per file (`OPENLANE_MCP_MAX_UPLOAD_BYTES`). Presigned download URLs are still omitted from read responses.
+Evidence file uploads use `files[]` objects with `filename`, optional `content_type`, and `content_base64`. Entity logos use the same size limit via a single `logo` object. Default max decoded size is 10 MiB per file (`OPENLANE_MCP_MAX_UPLOAD_BYTES`). Presigned download URLs are still omitted from read responses.
 
 `cancelWorkflowInstance` / `forceCompleteWorkflowInstance` exist in the GraphQL schema but have no go-client methods and are **not** exposed as MCP tools.
 

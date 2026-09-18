@@ -64,6 +64,15 @@ func (f *fakeAPI) GetUserByID(_ context.Context, _ string) (*graphclient.GetUser
 	}
 	return nil, errors.New("unused")
 }
+func (f *fakeAPI) GetOrgMembers(_ context.Context, where *graphclient.OrgMembershipWhereInput) (*graphclient.GetOrgMembersByOrgID, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	if f.orgMembers != nil {
+		return f.orgMembers, nil
+	}
+	return &graphclient.GetOrgMembersByOrgID{}, nil
+}
 func (f *fakeAPI) GetWorkflowMetadata(context.Context) (*openlane.WorkflowMetadata, error) {
 	if f.err != nil {
 		return nil, f.err

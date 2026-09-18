@@ -18,7 +18,7 @@ internal/openlane       Client wrapper, uploads, pagination, redaction
 internal/tools          MCP tool handlers (read / write / delete)
 ```
 
-Evidence file uploads decode base64 MCP payloads and pass `graphql.Upload` values to `CreateEvidence` / `UpdateEvidence`. There is no separate upload API.
+Evidence file uploads decode base64 MCP payloads and pass `graphql.Upload` values to `CreateEvidence` / `UpdateEvidence`. Entity logo uploads use the same decode path and custom GraphQL `createEntity` / `updateEntity` mutations with `logoFile` (omitted from go-client v0.14.0 generated mutations). There is no separate upload API.
 
 Enriched get tools issue one primary `Get*ByID` call plus bounded parallel list queries for relationship summaries (up to eight items per relation). There is no built-in compliance scoring or gap analysis.
 

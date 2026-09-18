@@ -5,6 +5,8 @@ import (
 	"errors"
 
 	"github.com/theopenlane/go-client/graphclient"
+
+	"github.com/GregDog/mcp-server-theopenlane/internal/openlane"
 )
 
 func (f *fakeAPI) GetTaskByID(context.Context, string) (*graphclient.GetTaskByID, error) {
@@ -15,6 +17,15 @@ func (f *fakeAPI) GetEntities(context.Context, *int64, *string, *graphclient.Ent
 }
 func (f *fakeAPI) GetEntityByID(context.Context, string) (*graphclient.GetEntityByID, error) {
 	return nil, errors.New("unused")
+}
+func (f *fakeAPI) GetEntityDetail(_ context.Context, id string) (*openlane.EntityDetail, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	if f.entity != nil {
+		return f.entity, nil
+	}
+	return &openlane.EntityDetail{ID: id, Name: strPtr("Acme Vendor")}, nil
 }
 func (f *fakeAPI) GetAssets(context.Context, *int64, *string, *graphclient.AssetWhereInput) (*graphclient.GetAssets, error) {
 	return nil, errors.New("unused")

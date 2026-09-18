@@ -35,6 +35,7 @@ type GraphAPI interface {
 	GetTaskByID(ctx context.Context, id string) (*graphclient.GetTaskByID, error)
 	GetEntities(ctx context.Context, first *int64, after *string, where *graphclient.EntityWhereInput) (*graphclient.GetEntities, error)
 	GetEntityByID(ctx context.Context, id string) (*graphclient.GetEntityByID, error)
+	GetEntityDetail(ctx context.Context, id string) (*EntityDetail, error)
 	GetAssets(ctx context.Context, first *int64, after *string, where *graphclient.AssetWhereInput) (*graphclient.GetAssets, error)
 	GetAssetByID(ctx context.Context, id string) (*graphclient.GetAssetByID, error)
 	GetContacts(ctx context.Context, first *int64, after *string, where *graphclient.ContactWhereInput) (*graphclient.GetContacts, error)
@@ -62,6 +63,7 @@ type GraphAPI interface {
 	GetGroupByID(ctx context.Context, id string) (*graphclient.GetGroupByID, error)
 	GetUsers(ctx context.Context, first *int64, after *string, where *graphclient.UserWhereInput) (*graphclient.GetUsers, error)
 	GetUserByID(ctx context.Context, id string) (*graphclient.GetUserByID, error)
+	GetOrgMembers(ctx context.Context, where *graphclient.OrgMembershipWhereInput) (*graphclient.GetOrgMembersByOrgID, error)
 	CreateWorkflowDefinition(ctx context.Context, input graphclient.CreateWorkflowDefinitionInput) (*graphclient.CreateWorkflowDefinition, error)
 	UpdateWorkflowDefinition(ctx context.Context, id string, input graphclient.UpdateWorkflowDefinitionInput) (*graphclient.UpdateWorkflowDefinition, error)
 	DeleteWorkflowDefinition(ctx context.Context, id string) (string, error)
@@ -79,6 +81,8 @@ type GraphAPI interface {
 	UpdateRisk(ctx context.Context, id string, input graphclient.UpdateRiskInput) (*graphclient.UpdateRisk, error)
 	CreateTask(ctx context.Context, input graphclient.CreateTaskInput) (*graphclient.CreateTask, error)
 	UpdateTask(ctx context.Context, id string, input graphclient.UpdateTaskInput) (*graphclient.UpdateTask, error)
+	CreateEntity(ctx context.Context, input graphclient.CreateEntityInput, entityTypeName *string, logoFile *graphql.Upload) (*EntityDetail, error)
+	UpdateEntity(ctx context.Context, id string, input graphclient.UpdateEntityInput, logoFile *graphql.Upload) (*EntityDetail, error)
 	DeleteControl(ctx context.Context, id string) (string, error)
 	DeleteEvidence(ctx context.Context, id string) (string, error)
 	DeleteInternalPolicy(ctx context.Context, id string) (string, error)
@@ -275,6 +279,10 @@ func (a *api) GetUsers(ctx context.Context, first *int64, after *string, where *
 
 func (a *api) GetUserByID(ctx context.Context, id string) (*graphclient.GetUserByID, error) {
 	return a.c.GetUserByID(ctx, id)
+}
+
+func (a *api) GetOrgMembers(ctx context.Context, where *graphclient.OrgMembershipWhereInput) (*graphclient.GetOrgMembersByOrgID, error) {
+	return a.c.GetOrgMembersByOrgID(ctx, where)
 }
 
 func (a *api) CreateWorkflowDefinition(ctx context.Context, input graphclient.CreateWorkflowDefinitionInput) (*graphclient.CreateWorkflowDefinition, error) {

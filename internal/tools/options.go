@@ -5,4 +5,5 @@ type Options struct {
 	AllowWrite     bool
 	AllowDelete    bool
 	MaxUploadBytes int64
+	OrganizationID string
 }
