@@ -83,6 +83,7 @@ type updateEntityInput struct {
 	InternalOwner         string           `json:"internal_owner,omitempty" jsonschema:"Updated internal owner name."`
 	InternalOwnerUserID   string           `json:"internal_owner_user_id,omitempty" jsonschema:"Updated internal owner user ID."`
 	InternalOwnerGroupID  string           `json:"internal_owner_group_id,omitempty" jsonschema:"Updated internal owner group ID."`
+	AddContactIDs         []string         `json:"add_contact_ids,omitempty" jsonschema:"Contact IDs to associate with this entity (vendor)."`
 	LogoRemoteURL         string           `json:"logo_remote_url,omitempty" jsonschema:"Updated remote logo URL."`
 	Logo                  *entityLogoInput `json:"logo,omitempty" jsonschema:"Optional logo file uploaded as base64."`
 }
@@ -98,7 +99,7 @@ func registerWriteEntities(server *mcp.Server, h *handlers) {
 	addTool(server, &mcp.Tool{
 		Name:        "openlane_entity_update",
 		Title:       "Update an Openlane entity",
-		Description: "Update an entity (vendor) by ID. Optional logo upload via base64 or logo_remote_url. Requires write mode.",
+		Description: "Update an entity (vendor) by ID. Optional logo upload via base64 or logo_remote_url. Use add_contact_ids to associate contacts. Requires write mode.",
 		Annotations: writeAnnotations(),
 	}, h.updateEntity)
 }
@@ -329,6 +330,9 @@ func applyUpdateEntityFields(input *graphclient.UpdateEntityInput, in updateEnti
 	if s := strings.TrimSpace(in.LogoRemoteURL); s != "" {
 		input.LogoRemoteURL = &s
 	}
+	if len(in.AddContactIDs) > 0 {
+		input.AddContactIDs = in.AddContactIDs
+	}
 	return nil
 }
 
@@ -399,5 +403,6 @@ func isEmptyUpdateEntity(in graphclient.UpdateEntityInput) bool {
 		in.InternalOwner == nil &&
 		in.InternalOwnerUserID == nil &&
 		in.InternalOwnerGroupID == nil &&
-		in.LogoRemoteURL == nil
+		in.LogoRemoteURL == nil &&
+		len(in.AddContactIDs) == 0
 }

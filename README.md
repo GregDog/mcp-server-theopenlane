@@ -177,6 +177,7 @@ Tokens are never logged. See [docs/security.md](docs/security.md).
 | `openlane_asset_get` | Get an asset by ID |
 | `openlane_contacts_list` | List contacts |
 | `openlane_contact_get` | Get a contact by ID |
+| `openlane_contact_create` | Create a contact (optional `entity_ids`) |
 | `openlane_groups_list` | List groups (optional name filter) |
 | `openlane_group_get` | Get a group by ID |
 | `openlane_users_list` | List users (optional name/email filters) |

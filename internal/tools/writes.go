@@ -58,3 +58,7 @@ func deleteAnnotations() *mcp.ToolAnnotations {
 func taskStatus(value string) *enums.TaskStatus {
 	return enumPtr[enums.TaskStatus](value)
 }
+
+func userStatus(value string) *enums.UserStatus {
+	return enumPtr[enums.UserStatus](value)
+}

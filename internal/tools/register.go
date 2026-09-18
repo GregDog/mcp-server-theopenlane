@@ -40,6 +40,7 @@ func Register(server *mcp.Server, api openlane.GraphAPI, opts Options) {
 		registerWriteRisks(server, h)
 		registerWriteTasks(server, h)
 		registerWriteEntities(server, h)
+		registerWriteContacts(server, h)
 		registerWriteWorkflows(server, h)
 		registerWriteWorkflowAssignments(server, h)
 		registerPolicyLifecycle(server, h)

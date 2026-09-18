@@ -7,6 +7,9 @@ All notable changes to this project are documented in this file.
 ### Added
 
 - Entity (vendor) write tools: `openlane_entity_create` and `openlane_entity_update` (opt-in via `OPENLANE_ALLOW_WRITE`)
+- `openlane_contact_create` with optional `entity_ids` vendor association on create
+- `add_contact_ids` on `openlane_entity_update` to link contacts to vendors
+- `entity_ids` on `openlane_risk_create` and `add_entity_ids` on `openlane_risk_update` for vendor risk linkage
 
 ### Fixed
 

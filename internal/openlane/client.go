@@ -40,6 +40,7 @@ type GraphAPI interface {
 	GetAssetByID(ctx context.Context, id string) (*graphclient.GetAssetByID, error)
 	GetContacts(ctx context.Context, first *int64, after *string, where *graphclient.ContactWhereInput) (*graphclient.GetContacts, error)
 	GetContactByID(ctx context.Context, id string) (*graphclient.GetContactByID, error)
+	CreateContact(ctx context.Context, input graphclient.CreateContactInput) (*graphclient.CreateContact, error)
 	GetControlImplementations(ctx context.Context, first *int64, after *string, where *graphclient.ControlImplementationWhereInput) (*graphclient.GetControlImplementations, error)
 	GetControlImplementationByID(ctx context.Context, id string) (*graphclient.GetControlImplementationByID, error)
 	GetAssessments(ctx context.Context, first *int64, after *string, where *graphclient.AssessmentWhereInput) (*graphclient.GetAssessments, error)
@@ -199,6 +200,10 @@ func (a *api) GetContacts(ctx context.Context, first *int64, after *string, wher
 
 func (a *api) GetContactByID(ctx context.Context, id string) (*graphclient.GetContactByID, error) {
 	return a.c.GetContactByID(ctx, id)
+}
+
+func (a *api) CreateContact(ctx context.Context, input graphclient.CreateContactInput) (*graphclient.CreateContact, error) {
+	return a.c.CreateContact(ctx, input)
 }
 
 func (a *api) GetControlImplementations(ctx context.Context, first *int64, after *string, where *graphclient.ControlImplementationWhereInput) (*graphclient.GetControlImplementations, error) {

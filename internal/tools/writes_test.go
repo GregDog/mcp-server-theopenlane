@@ -47,4 +47,9 @@ func TestWriteValidationRequiresFields(t *testing.T) {
 	if err != errUpdateFieldsRequired {
 		t.Fatalf("update entity: got %v", err)
 	}
+
+	_, _, err = h.createContact(context.Background(), nil, createContactInput{})
+	if err != errContactIdentifierRequired {
+		t.Fatalf("create contact: got %v", err)
+	}
 }

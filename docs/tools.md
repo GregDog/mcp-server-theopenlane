@@ -233,6 +233,7 @@ Entities represent vendors and other third parties in Openlane. There is no sepa
 | --- | --- |
 | `openlane_contacts_list` | `GetContacts` |
 | `openlane_contact_get` | `GetContactByID` |
+| `openlane_contact_create` | `CreateContact` (optional `entity_ids`) |
 
 ## Groups and users
 

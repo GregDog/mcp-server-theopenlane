@@ -34,8 +34,18 @@ func (f *fakeAPI) UpdateInternalPolicy(_ context.Context, _ string, input graphc
 	}
 	return &graphclient.UpdateInternalPolicy{}, nil
 }
-func (f *fakeAPI) CreateRisk(context.Context, graphclient.CreateRiskInput) (*graphclient.CreateRisk, error) {
-	return nil, errors.New("unused")
+func (f *fakeAPI) CreateRisk(_ context.Context, input graphclient.CreateRiskInput) (*graphclient.CreateRisk, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	return &graphclient.CreateRisk{
+		CreateRisk: graphclient.CreateRisk_CreateRisk{
+			Risk: graphclient.CreateRisk_CreateRisk_Risk{
+				ID:   "risk_1",
+				Name: input.Name,
+			},
+		},
+	}, nil
 }
 func (f *fakeAPI) UpdateRisk(context.Context, string, graphclient.UpdateRiskInput) (*graphclient.UpdateRisk, error) {
 	return nil, errors.New("unused")
@@ -60,6 +70,21 @@ func (f *fakeAPI) DeleteRisk(context.Context, string) (string, error) {
 }
 func (f *fakeAPI) DeleteTask(context.Context, string) (string, error) {
 	return "", errors.New("unused")
+}
+func (f *fakeAPI) CreateContact(_ context.Context, input graphclient.CreateContactInput) (*graphclient.CreateContact, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	return &graphclient.CreateContact{
+		CreateContact: graphclient.CreateContact_CreateContact{
+			Contact: graphclient.CreateContact_CreateContact_Contact{
+				ID:       "contact_1",
+				FullName: input.FullName,
+				Email:    input.Email,
+				Tags:     input.Tags,
+			},
+		},
+	}, nil
 }
 func (f *fakeAPI) CreateEntity(_ context.Context, input graphclient.CreateEntityInput, _ *string, _ *graphql.Upload) (*openlane.EntityDetail, error) {
 	if f.err != nil {
