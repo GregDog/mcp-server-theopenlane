@@ -2,7 +2,7 @@
 
 Read tools are always registered. Write and delete tools are registered only when their mode is enabled.
 
-With all modes enabled there are **66 tools** (40 read, 20 write, 6 delete).
+With all modes enabled there are **73 tools** (42 read, 25 write, 6 delete).
 
 Arguments are validated by the MCP Go SDK from Go structs.
 

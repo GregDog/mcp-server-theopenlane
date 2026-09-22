@@ -27,7 +27,7 @@ The server is read-only by default. Write and delete tools are opt-in and indepe
 - Openlane MCP access for programs, controls, evidence, policies, risks, standards, tasks, entities (vendors), assets, contacts, findings, assessments, control implementations, groups, users, and workflows
 - Enriched get tools with vendor/security fields and compact relationship summaries
 - List filters on entities, risks, findings, evidence, programs, assessments, implementations, and workflows
-- Opt-in create/update tools for controls, evidence, policies, risks, tasks, workflow definitions, workflow assignments, and native policy lifecycle
+- Opt-in create/update tools for controls, evidence, policies, risks, tasks, vendors/entities, contacts, vendor Risk Reviews, workflow definitions, workflow assignments, and native policy lifecycle
 - Opt-in delete tools for the same domains plus workflow definitions (except programs and standards)
 - Openlane Cloud and self-hosted Openlane (configurable base URL)
 - stdio transport (default) and opt-in Streamable HTTP transport
@@ -177,7 +177,8 @@ Tokens are never logged. See [docs/security.md](docs/security.md).
 | `openlane_asset_get` | Get an asset by ID |
 | `openlane_contacts_list` | List contacts |
 | `openlane_contact_get` | Get a contact by ID |
-| `openlane_contact_create` | Create a contact (optional `entity_ids`) |
+| `openlane_reviews_list` | List vendor Risk Reviews (optional entity filter) |
+| `openlane_review_get` | Get a vendor Risk Review by ID |
 | `openlane_groups_list` | List groups (optional name filter) |
 | `openlane_group_get` | Get a group by ID |
 | `openlane_users_list` | List users (optional name/email filters) |
@@ -202,6 +203,8 @@ Write tools (require `OPENLANE_ALLOW_WRITE=true` or `--allow-write`):
 | `openlane_risk_create` / `openlane_risk_update` | Create or update a risk |
 | `openlane_task_create` / `openlane_task_update` | Create or update a task |
 | `openlane_entity_create` / `openlane_entity_update` | Create or update an entity (vendor); optional base64 logo upload or `logo_remote_url` |
+| `openlane_contact_create` | Create a contact (optional `entity_ids`) |
+| `openlane_vendor_risk_review_create` / `openlane_vendor_risk_review_update` | Create or update a vendor Risk Review |
 | `openlane_workflow_create` / `openlane_workflow_update` | Create or update a WorkflowDefinition (`confirm` required) |
 | `openlane_workflow_assignment_approve` / `openlane_workflow_assignment_reject` | Approve or reject a WorkflowAssignment (`confirm` required) |
 | `openlane_workflow_assignment_request_changes` / `openlane_workflow_assignment_reassign` | Request changes or reassign an assignment (`confirm` required) |
@@ -217,7 +220,7 @@ Delete tools (require `OPENLANE_ALLOW_DELETE=true` or `--allow-delete`):
 | `openlane_task_delete` | Delete a task by ID |
 | `openlane_workflow_delete` | Delete a workflow definition by ID (`confirm` required) |
 
-See [docs/tools.md](docs/tools.md) for full details. With all modes enabled there are **66 tools** (40 read, 20 write, 6 delete).
+See [docs/tools.md](docs/tools.md) for full details. With all modes enabled there are **73 tools** (42 read, 25 write, 6 delete).
 
 Enriched get tools return bounded relationship summaries (`count` + `items`) so agents can answer program, vendor, control, and finding questions without chaining dozens of shallow calls.
 
