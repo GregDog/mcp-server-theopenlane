@@ -6,7 +6,7 @@ require (
 	github.com/99designs/gqlgen v0.17.95
 	github.com/modelcontextprotocol/go-sdk v1.7.0
 	github.com/theopenlane/core/common v1.1.0
-	github.com/theopenlane/go-client v0.14.0
+	github.com/theopenlane/go-client v0.14.1
 )
 
 require (
@@ -26,7 +26,7 @@ require (
 	github.com/google/jsonschema-go v0.4.3 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
-	github.com/gqlgo/gqlgenc v0.38.1 // indirect
+	github.com/gqlgo/gqlgenc v0.38.2 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.30.0 // indirect
 	github.com/labstack/echo/v5 v5.3.1 // indirect
 	github.com/mattn/go-colorable v0.1.15 // indirect
