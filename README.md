@@ -235,7 +235,7 @@ File contents and presigned download URLs are not returned from read tools. Writ
 
 `openlane_evidence_create` accepts optional `control_ids`; `openlane_evidence_update` supports `add_control_ids` / `remove_control_ids`. Only **org-owned** controls (`owner_id` set) may be linked — system catalog copies are rejected ([core#1647](https://github.com/theopenlane/core/pull/1647)). Use `openlane_controls_search` with `linkable_only: true` to list linkable controls. Program-imported controls may still show `source: FRAMEWORK` when `owner_id` is set.
 
-`openlane_control_update` accepts `owner_id` and `delegate_id` as user id, email, name, or group id; user identifiers resolve to managed personal groups (Openlane `controlOwnerID` / `delegateID`).
+`openlane_control_update` accepts `owner_id` and `delegate_id` as user id, email, name, or group id; user identifiers resolve to managed personal groups (Openlane `controlOwnerID` / `delegateID`). Read responses include `control_owner` and `delegate` objects with resolved `user_email` — do not use `openlane_user_get` on group ids. See [docs/openlane-assignee-ids.md](docs/openlane-assignee-ids.md) (user vs group vs org; what is fixed globally vs controls-only).
 
 For large `files[]` base64 uploads, prefer a direct MCP client or automation script that passes the payload machine-to-machine. Agent loops that copy `content_base64` between tool calls may truncate or corrupt the data.
 

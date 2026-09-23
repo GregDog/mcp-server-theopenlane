@@ -10,6 +10,10 @@ import (
 	"github.com/GregDog/mcp-server-theopenlane/internal/openlane"
 )
 
+// Assignee helpers for Openlane fields that store group IDs (controlOwnerID, delegateID,
+// and the same pattern on risks/policies). Not global yet — only wired for controls.
+// See docs/openlane-assignee-ids.md before adding risk/policy assignee tools.
+//
 // groupAssigneeSummary resolves Openlane controlOwnerID/delegateID group ids to names and users.
 type groupAssigneeSummary struct {
 	GroupID          string `json:"group_id,omitempty"`

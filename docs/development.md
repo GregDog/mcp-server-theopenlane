@@ -160,6 +160,10 @@ MCP read tools return `file_ids` but not presigned download URLs. Verify downloa
 
 When testing CSV or other large file uploads through an agent, use a direct MCP client or script for the create call — relaying `content_base64` through multi-step agent tool chains often corrupts the payload.
 
+### Assignee IDs (user vs group vs org)
+
+Openlane responsibility fields use **group IDs**, not user IDs. Control `owner_id` on read is the **org** id. Passing user ids to `controlOwnerID`/`delegateID` causes `UNAUTHORIZED`; passing group ids to `openlane_user_get` fails. Controls are handled in MCP (write resolution + read `control_owner`/`delegate` objects). Risks and policies are not yet — see [openlane-assignee-ids.md](openlane-assignee-ids.md).
+
 ## Tool inventory
 
 | Mode | Count |

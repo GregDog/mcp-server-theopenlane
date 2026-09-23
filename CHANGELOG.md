@@ -12,6 +12,7 @@ All notable changes to this project are documented in this file.
 - `delegate_id` on `openlane_control_create` / `openlane_control_update`; `delegate_id` on control get responses
 - `owner_id` / `delegate_id` on control writes accept user id, email, name, or group id and resolve users to managed personal groups before calling Openlane `controlOwnerID` / `delegateID`
 - `control_owner` and `delegate` objects on control list/search/get/update responses resolve group ids to display names and org member email
+- [docs/openlane-assignee-ids.md](docs/openlane-assignee-ids.md) — user vs group vs org ID guide (controls fixed; risks/policies documented for future tools)
 
 ### Fixed
 
