@@ -19,6 +19,7 @@ type fakeAPI struct {
 	policy     *graphclient.GetInternalPolicyByID
 	groups     *graphclient.GetGroups
 	group      *graphclient.GetGroupByID
+	groupsByID map[string]graphclient.GetGroupByID_Group
 	users      *graphclient.GetUsers
 	orgMembers *graphclient.GetOrgMembersByOrgID
 	user       *graphclient.GetUserByID

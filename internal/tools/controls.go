@@ -24,7 +24,9 @@ type controlItem struct {
 	StandardID             string                         `json:"standard_id,omitempty"`
 	OwnerID                string                         `json:"owner_id,omitempty"`
 	ControlOwnerID         string                         `json:"control_owner_id,omitempty"`
+	ControlOwner           *groupAssigneeSummary          `json:"control_owner,omitempty"`
 	DelegateID             string                         `json:"delegate_id,omitempty"`
+	Delegate               *groupAssigneeSummary          `json:"delegate,omitempty"`
 	ControlKindName        string                         `json:"control_kind_name,omitempty"`
 	ImplementationGuidance any                            `json:"implementation_guidance,omitempty"`
 	AssessmentMethods      any                            `json:"assessment_methods,omitempty"`
@@ -67,7 +69,11 @@ func (h *handlers) listControls(ctx context.Context, _ *mcp.CallToolRequest, in 
 	if err != nil {
 		return nil, openlane.Page[controlItem]{}, openlane.APIError(err)
 	}
-	return nil, mapControlPage(resp.Controls.Edges, resp.Controls.PageInfo.HasNextPage, resp.Controls.PageInfo.EndCursor, resp.Controls.TotalCount), nil
+	page := mapControlPage(resp.Controls.Edges, resp.Controls.PageInfo.HasNextPage, resp.Controls.PageInfo.EndCursor, resp.Controls.TotalCount)
+	if err := enrichControlPageAssignees(ctx, h, page.Items); err != nil {
+		return nil, openlane.Page[controlItem]{}, err
+	}
+	return nil, page, nil
 }
 
 func (h *handlers) searchControls(ctx context.Context, _ *mcp.CallToolRequest, in controlSearchInput) (*mcp.CallToolResult, openlane.Page[controlItem], error) {
@@ -87,7 +93,11 @@ func (h *handlers) searchControls(ctx context.Context, _ *mcp.CallToolRequest, i
 	if err != nil {
 		return nil, openlane.Page[controlItem]{}, openlane.APIError(err)
 	}
-	return nil, mapControlPage(resp.Controls.Edges, resp.Controls.PageInfo.HasNextPage, resp.Controls.PageInfo.EndCursor, resp.Controls.TotalCount), nil
+	page := mapControlPage(resp.Controls.Edges, resp.Controls.PageInfo.HasNextPage, resp.Controls.PageInfo.EndCursor, resp.Controls.TotalCount)
+	if err := enrichControlPageAssignees(ctx, h, page.Items); err != nil {
+		return nil, openlane.Page[controlItem]{}, err
+	}
+	return nil, page, nil
 }
 
 func (h *handlers) getControl(ctx context.Context, _ *mcp.CallToolRequest, in getInput) (*mcp.CallToolResult, controlItem, error) {
@@ -100,6 +110,9 @@ func (h *handlers) getControl(ctx context.Context, _ *mcp.CallToolRequest, in ge
 	}
 	c := resp.Control
 	item := mapControlDetail(c)
+	if err := h.enrichControlAssignees(ctx, &item, nil); err != nil {
+		return nil, controlItem{}, err
+	}
 	controlWhere := []*graphclient.ControlWhereInput{{ID: &in.ID}}
 	runRelJobs(
 		func() {

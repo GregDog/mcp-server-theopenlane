@@ -44,6 +44,11 @@ func (f *fakeAPI) GetGroups(_ context.Context, _ *int64, _ *string, _ *graphclie
 	return nil, errors.New("unused")
 }
 func (f *fakeAPI) GetGroupByID(_ context.Context, id string) (*graphclient.GetGroupByID, error) {
+	if f.groupsByID != nil {
+		if g, ok := f.groupsByID[id]; ok {
+			return &graphclient.GetGroupByID{Group: g}, nil
+		}
+	}
 	if f.group == nil {
 		return nil, errors.New("unused")
 	}

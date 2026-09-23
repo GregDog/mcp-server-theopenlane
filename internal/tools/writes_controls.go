@@ -100,7 +100,11 @@ func (h *handlers) createControl(ctx context.Context, _ *mcp.CallToolRequest, in
 	if err != nil {
 		return nil, controlItem{}, openlane.APIError(err)
 	}
-	return nil, mapCreatedControl(resp.CreateControl.Control), nil
+	item := mapCreatedControl(resp.CreateControl.Control)
+	if err := h.enrichControlAssignees(ctx, &item, nil); err != nil {
+		return nil, controlItem{}, err
+	}
+	return nil, item, nil
 }
 
 func (h *handlers) updateControl(ctx context.Context, _ *mcp.CallToolRequest, in updateControlInput) (*mcp.CallToolResult, controlItem, error) {
@@ -151,7 +155,11 @@ func (h *handlers) updateControl(ctx context.Context, _ *mcp.CallToolRequest, in
 	if err != nil {
 		return nil, controlItem{}, openlane.APIError(err)
 	}
-	return nil, mapUpdatedControl(resp.UpdateControl.Control), nil
+	item := mapUpdatedControl(resp.UpdateControl.Control)
+	if err := h.enrichControlAssignees(ctx, &item, nil); err != nil {
+		return nil, controlItem{}, err
+	}
+	return nil, item, nil
 }
 
 func mapCreatedControl(c graphclient.CreateControl_CreateControl_Control) controlItem {

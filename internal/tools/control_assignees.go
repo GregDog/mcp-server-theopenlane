@@ -10,6 +10,16 @@ import (
 	"github.com/GregDog/mcp-server-theopenlane/internal/openlane"
 )
 
+// groupAssigneeSummary resolves Openlane controlOwnerID/delegateID group ids to names and users.
+type groupAssigneeSummary struct {
+	GroupID          string `json:"group_id,omitempty"`
+	GroupName        string `json:"group_name,omitempty"`
+	GroupDisplayName string `json:"group_display_name,omitempty"`
+	UserID           string `json:"user_id,omitempty"`
+	UserDisplayName  string `json:"user_display_name,omitempty"`
+	UserEmail        string `json:"user_email,omitempty"`
+}
+
 // resolveControlAssigneeGroupID maps a user id/email/name or group id/name to the
 // Openlane group id required by controlOwnerID and delegateID on UpdateControl.
 func (h *handlers) resolveControlAssigneeGroupID(ctx context.Context, assignee string) (string, error) {
@@ -72,6 +82,112 @@ func (h *handlers) resolvePersonalManagedGroupForUser(ctx context.Context, userI
 		nodes = append(nodes, *e.Node)
 	}
 	return pickPersonalManagedGroup(userID, nodes)
+}
+
+func (h *handlers) resolveGroupAssigneeSummary(ctx context.Context, groupID string, cache map[string]groupAssigneeSummary) (groupAssigneeSummary, error) {
+	groupID = strings.TrimSpace(groupID)
+	if groupID == "" {
+		return groupAssigneeSummary{}, nil
+	}
+	if cache != nil {
+		if cached, ok := cache[groupID]; ok {
+			return cached, nil
+		}
+	}
+
+	resp, err := h.api.GetGroupByID(ctx, groupID)
+	if err != nil {
+		return groupAssigneeSummary{}, openlane.APIError(err)
+	}
+	g := resp.Group
+	out := groupAssigneeSummary{
+		GroupID:          g.ID,
+		GroupName:        g.Name,
+		GroupDisplayName: g.DisplayName,
+	}
+	if openlane.Deref(g.IsManaged) {
+		out.UserID = userIDFromManagedGroupName(g.Name)
+	}
+	if out.UserID != "" {
+		displayName, email := h.lookupOrgMemberContact(ctx, out.UserID)
+		out.UserDisplayName = displayName
+		out.UserEmail = email
+	}
+	if cache != nil {
+		cache[groupID] = out
+	}
+	return out, nil
+}
+
+func (h *handlers) lookupOrgMemberContact(ctx context.Context, userID string) (displayName, email string) {
+	userID = strings.TrimSpace(userID)
+	if userID == "" || strings.TrimSpace(h.organizationID) == "" {
+		return "", ""
+	}
+	orgID := h.organizationID
+	resp, err := h.api.GetOrgMembers(ctx, &graphclient.OrgMembershipWhereInput{
+		OrganizationID: &orgID,
+		UserID:         &userID,
+	})
+	if err != nil {
+		return "", ""
+	}
+	for _, e := range resp.OrgMemberships.Edges {
+		if e == nil || e.Node == nil {
+			continue
+		}
+		u := e.Node.User
+		return u.DisplayName, u.Email
+	}
+	return "", ""
+}
+
+func userIDFromManagedGroupName(name string) string {
+	const sep = " - "
+	i := strings.LastIndex(name, sep)
+	if i < 0 {
+		return ""
+	}
+	id := strings.TrimSpace(name[i+len(sep):])
+	if looksLikeOpenlaneID(id) {
+		return id
+	}
+	return ""
+}
+
+func (h *handlers) enrichControlAssignees(ctx context.Context, item *controlItem, cache map[string]groupAssigneeSummary) error {
+	if item == nil {
+		return nil
+	}
+	if item.ControlOwnerID != "" {
+		summary, err := h.resolveGroupAssigneeSummary(ctx, item.ControlOwnerID, cache)
+		if err != nil {
+			return err
+		}
+		if summary.GroupID != "" {
+			item.ControlOwner = &summary
+		}
+	}
+	if item.DelegateID != "" {
+		summary, err := h.resolveGroupAssigneeSummary(ctx, item.DelegateID, cache)
+		if err != nil {
+			return err
+		}
+		if summary.GroupID != "" {
+			item.Delegate = &summary
+		}
+	}
+	return nil
+}
+
+func enrichControlPageAssignees(ctx context.Context, h *handlers, items []controlItem) error {
+	cache := make(map[string]groupAssigneeSummary)
+	for i := range items {
+		if err := h.enrichControlAssignees(ctx, &items[i], cache); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func pickPersonalManagedGroup(userID string, groups []graphclient.GetGroups_Groups_Edges_Node) (string, error) {

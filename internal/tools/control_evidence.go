@@ -54,6 +54,8 @@ func mapControlListNode(n *graphclient.GetControls_Controls_Edges_Node) controlI
 		Status:             openlane.Format(n.Status),
 		Source:             openlane.Format(n.Source),
 		OwnerID:            openlane.Deref(n.OwnerID),
+		ControlOwnerID:     openlane.Deref(n.ControlOwnerID),
+		DelegateID:         openlane.Deref(n.DelegateID),
 		LinkableToEvidence: openlane.ControlLinkableToEvidence(n.OwnerID),
 		ReferenceFramework: openlane.Deref(n.ReferenceFramework),
 		Category:           openlane.Deref(n.Category),

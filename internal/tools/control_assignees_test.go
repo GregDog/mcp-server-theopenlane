@@ -57,6 +57,7 @@ func TestUpdateControlResolvesOwnerAndDelegate(t *testing.T) {
 	ownerGroup := "01GROUPGROUPGROUPGROUPGR03"
 	delegateGroup := "01GROUPGROUPGROUPGROUPGR04"
 	email := "alice@example.com"
+	managed := true
 	api := &fakeAPI{
 		orgMembers: &graphclient.GetOrgMembersByOrgID{
 			OrgMemberships: graphclient.GetOrgMembersByOrgID_OrgMemberships{
@@ -64,16 +65,27 @@ func TestUpdateControlResolvesOwnerAndDelegate(t *testing.T) {
 					{
 						Node: &graphclient.GetOrgMembersByOrgID_OrgMemberships_Edges_Node{
 							User: graphclient.GetOrgMembersByOrgID_OrgMemberships_Edges_Node_User{
-								ID:    userID,
-								Email: email,
+								ID:          userID,
+								Email:       email,
+								DisplayName: "Alice Example",
 							},
 						},
 					},
 				},
 			},
 		},
-		group: &graphclient.GetGroupByID{
-			Group: graphclient.GetGroupByID_Group{ID: delegateGroup, Name: "delegate"},
+		groupsByID: map[string]graphclient.GetGroupByID_Group{
+			ownerGroup: {
+				ID:          ownerGroup,
+				Name:        "alice - " + userID,
+				DisplayName: "alice",
+				IsManaged:   &managed,
+			},
+			delegateGroup: {
+				ID:          delegateGroup,
+				Name:        "delegate",
+				DisplayName: "delegate",
+			},
 		},
 		groups: &graphclient.GetGroups{
 			Groups: graphclient.GetGroups_Groups{
@@ -103,6 +115,107 @@ func TestUpdateControlResolvesOwnerAndDelegate(t *testing.T) {
 	}
 	if api.lastUpdateControlInput.DelegateID == nil || *api.lastUpdateControlInput.DelegateID != delegateGroup {
 		t.Fatalf("delegate: %+v", api.lastUpdateControlInput.DelegateID)
+	}
+}
+
+func TestUserIDFromManagedGroupName(t *testing.T) {
+	userID := "01USERUSERUSERUSERUSERU04"
+	got := userIDFromManagedGroupName("Greg - " + userID)
+	if got != userID {
+		t.Fatalf("got %q want %q", got, userID)
+	}
+	if userIDFromManagedGroupName("Security Team") != "" {
+		t.Fatal("expected empty for non-managed group name")
+	}
+}
+
+func TestResolveGroupAssigneeSummaryIncludesUser(t *testing.T) {
+	userID := "01USERUSERUSERUSERUSERU05"
+	groupID := "01GROUPGROUPGROUPGROUPGR07"
+	email := "greg@example.com"
+	api := &fakeAPI{
+		group: &graphclient.GetGroupByID{
+			Group: graphclient.GetGroupByID_Group{
+				ID:          groupID,
+				Name:        "Greg - " + userID,
+				DisplayName: "Greg",
+				IsManaged:   boolPtr(true),
+			},
+		},
+		orgMembers: &graphclient.GetOrgMembersByOrgID{
+			OrgMemberships: graphclient.GetOrgMembersByOrgID_OrgMemberships{
+				Edges: []*graphclient.GetOrgMembersByOrgID_OrgMemberships_Edges{
+					{
+						Node: &graphclient.GetOrgMembersByOrgID_OrgMemberships_Edges_Node{
+							User: graphclient.GetOrgMembersByOrgID_OrgMemberships_Edges_Node_User{
+								ID:          userID,
+								DisplayName: "Greg Knell",
+								Email:       email,
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	h := &handlers{api: api, organizationID: "org_1"}
+	got, err := h.resolveGroupAssigneeSummary(context.Background(), groupID, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.UserID != userID || got.UserEmail != email || got.UserDisplayName != "Greg Knell" {
+		t.Fatalf("unexpected summary: %+v", got)
+	}
+}
+
+func TestGetControlEnrichesDelegate(t *testing.T) {
+	userID := "01USERUSERUSERUSERUSERU06"
+	groupID := "01GROUPGROUPGROUPGROUPGR08"
+	title := "Security awareness"
+	api := &fakeAPI{
+		control: &graphclient.GetControlByID{
+			Control: graphclient.GetControlByID_Control{
+				ID:             "ctrl_1",
+				RefCode:        "12.6.2",
+				Title:          &title,
+				DelegateID:     &groupID,
+				ControlOwnerID: &groupID,
+			},
+		},
+		group: &graphclient.GetGroupByID{
+			Group: graphclient.GetGroupByID_Group{
+				ID:          groupID,
+				Name:        "alice - " + userID,
+				DisplayName: "alice",
+				IsManaged:   boolPtr(true),
+			},
+		},
+		orgMembers: &graphclient.GetOrgMembersByOrgID{
+			OrgMemberships: graphclient.GetOrgMembersByOrgID_OrgMemberships{
+				Edges: []*graphclient.GetOrgMembersByOrgID_OrgMemberships_Edges{
+					{
+						Node: &graphclient.GetOrgMembersByOrgID_OrgMemberships_Edges_Node{
+							User: graphclient.GetOrgMembersByOrgID_OrgMemberships_Edges_Node_User{
+								ID:          userID,
+								DisplayName: "Alice Example",
+								Email:       "alice@example.com",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	h := &handlers{api: api, organizationID: "org_1"}
+	_, item, err := h.getControl(context.Background(), nil, getInput{ID: "ctrl_1"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if item.Delegate == nil || item.Delegate.UserEmail != "alice@example.com" {
+		t.Fatalf("delegate: %+v", item.Delegate)
+	}
+	if item.ControlOwner == nil || item.ControlOwner.UserID != userID {
+		t.Fatalf("control owner: %+v", item.ControlOwner)
 	}
 }
 
