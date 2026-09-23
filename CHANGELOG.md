@@ -4,6 +4,8 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-09-23
+
 ### Added
 
 - `control_ids` on `openlane_evidence_create`; `add_control_ids` / `remove_control_ids` on `openlane_evidence_update` (org-owned controls only)
@@ -12,7 +14,9 @@ All notable changes to this project are documented in this file.
 - `delegate_id` on `openlane_control_create` / `openlane_control_update`; `delegate_id` on control get responses
 - `owner_id` / `delegate_id` on control writes accept user id, email, name, or group id and resolve users to managed personal groups before calling Openlane `controlOwnerID` / `delegateID`
 - `control_owner` and `delegate` objects on control list/search/get/update responses resolve group ids to display names and org member email
-- [docs/openlane-assignee-ids.md](docs/openlane-assignee-ids.md) — user vs group vs org ID guide (controls fixed; risks/policies documented for future tools)
+- `stakeholder_id` / `delegate_id` on `openlane_risk_create` / `openlane_risk_update` with the same user→group resolution; `stakeholder` / `delegate` objects on risk list/get/create/update
+- `approver_id` / `delegate_id` and optional `approval_required` on `openlane_policy_create` / `openlane_policy_update`; `approver` / `delegate` objects on policy list/get/create/update and native lifecycle preview
+- [docs/openlane-assignee-ids.md](docs/openlane-assignee-ids.md) — user vs group vs org ID guide for controls, risks, and policies
 
 ### Fixed
 

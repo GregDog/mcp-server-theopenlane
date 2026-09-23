@@ -64,14 +64,28 @@ func (f *fakeAPI) UpdateEvidence(_ context.Context, id string, input graphclient
 func (f *fakeAPI) CreateInternalPolicy(context.Context, graphclient.CreateInternalPolicyInput) (*graphclient.CreateInternalPolicy, error) {
 	return nil, errors.New("unused")
 }
-func (f *fakeAPI) UpdateInternalPolicy(_ context.Context, _ string, input graphclient.UpdateInternalPolicyInput) (*graphclient.UpdateInternalPolicy, error) {
+func (f *fakeAPI) UpdateInternalPolicy(_ context.Context, id string, input graphclient.UpdateInternalPolicyInput) (*graphclient.UpdateInternalPolicy, error) {
 	if f.err != nil {
 		return nil, f.err
 	}
+	f.lastUpdatePolicyInput = input
 	if f.policy != nil && input.Status != nil {
 		f.policy.InternalPolicy.Status = input.Status
 	}
-	return &graphclient.UpdateInternalPolicy{}, nil
+	name := "updated"
+	if input.Name != nil {
+		name = *input.Name
+	}
+	return &graphclient.UpdateInternalPolicy{
+		UpdateInternalPolicy: graphclient.UpdateInternalPolicy_UpdateInternalPolicy{
+			InternalPolicy: graphclient.UpdateInternalPolicy_UpdateInternalPolicy_InternalPolicy{
+				ID:         id,
+				Name:       name,
+				ApproverID: input.ApproverID,
+				DelegateID: input.DelegateID,
+			},
+		},
+	}, nil
 }
 func (f *fakeAPI) CreateRisk(_ context.Context, input graphclient.CreateRiskInput) (*graphclient.CreateRisk, error) {
 	if f.err != nil {
@@ -86,13 +100,23 @@ func (f *fakeAPI) CreateRisk(_ context.Context, input graphclient.CreateRiskInpu
 		},
 	}, nil
 }
-func (f *fakeAPI) UpdateRisk(_ context.Context, id string, _ graphclient.UpdateRiskInput) (*graphclient.UpdateRisk, error) {
+func (f *fakeAPI) UpdateRisk(_ context.Context, id string, input graphclient.UpdateRiskInput) (*graphclient.UpdateRisk, error) {
 	if f.err != nil {
 		return nil, f.err
 	}
+	f.lastUpdateRiskInput = input
+	name := "updated"
+	if input.Name != nil {
+		name = *input.Name
+	}
 	return &graphclient.UpdateRisk{
 		UpdateRisk: graphclient.UpdateRisk_UpdateRisk{
-			Risk: graphclient.UpdateRisk_UpdateRisk_Risk{ID: id, Name: "updated"},
+			Risk: graphclient.UpdateRisk_UpdateRisk_Risk{
+				ID:            id,
+				Name:          name,
+				StakeholderID: input.StakeholderID,
+				DelegateID:    input.DelegateID,
+			},
 		},
 	}, nil
 }

@@ -82,14 +82,14 @@ func (h *handlers) createControl(ctx context.Context, _ *mcp.CallToolRequest, in
 		input.StandardID = &in.StandardID
 	}
 	if in.OwnerID != "" {
-		ownerGroupID, err := h.resolveControlAssigneeGroupID(ctx, in.OwnerID)
+		ownerGroupID, err := h.resolveGroupAssigneeGroupID(ctx, in.OwnerID)
 		if err != nil {
 			return nil, controlItem{}, err
 		}
 		input.ControlOwnerID = &ownerGroupID
 	}
 	if in.DelegateID != "" {
-		delegateGroupID, err := h.resolveControlAssigneeGroupID(ctx, in.DelegateID)
+		delegateGroupID, err := h.resolveGroupAssigneeGroupID(ctx, in.DelegateID)
 		if err != nil {
 			return nil, controlItem{}, err
 		}
@@ -131,14 +131,14 @@ func (h *handlers) updateControl(ctx context.Context, _ *mcp.CallToolRequest, in
 		input.StandardID = &in.StandardID
 	}
 	if in.OwnerID != "" {
-		ownerGroupID, err := h.resolveControlAssigneeGroupID(ctx, in.OwnerID)
+		ownerGroupID, err := h.resolveGroupAssigneeGroupID(ctx, in.OwnerID)
 		if err != nil {
 			return nil, controlItem{}, err
 		}
 		input.ControlOwnerID = &ownerGroupID
 	}
 	if in.DelegateID != "" {
-		delegateGroupID, err := h.resolveControlAssigneeGroupID(ctx, in.DelegateID)
+		delegateGroupID, err := h.resolveGroupAssigneeGroupID(ctx, in.DelegateID)
 		if err != nil {
 			return nil, controlItem{}, err
 		}

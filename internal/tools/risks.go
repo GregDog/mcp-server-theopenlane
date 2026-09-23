@@ -23,7 +23,9 @@ type riskItem struct {
 	RiskKindName  string                      `json:"risk_kind_name,omitempty"`
 	OwnerID       string                      `json:"owner_id,omitempty"`
 	StakeholderID string                      `json:"stakeholder_id,omitempty"`
+	Stakeholder   *groupAssigneeSummary       `json:"stakeholder,omitempty"`
 	DelegateID    string                      `json:"delegate_id,omitempty"`
+	Delegate      *groupAssigneeSummary       `json:"delegate,omitempty"`
 	Tags          []string                    `json:"tags,omitempty"`
 	Controls      *relSummary[controlRef]     `json:"controls,omitempty"`
 	Programs      *relSummary[idNameRef]      `json:"programs,omitempty"`
@@ -60,6 +62,9 @@ func (h *handlers) listRisks(ctx context.Context, _ *mcp.CallToolRequest, in ris
 		}
 		items = append(items, mapListRisk(e.Node))
 	}
+	if err := enrichRiskPageAssignees(ctx, h, items); err != nil {
+		return nil, openlane.Page[riskItem]{}, err
+	}
 	return nil, openlane.Page[riskItem]{
 		Items:      items,
 		NextCursor: resp.Risks.PageInfo.EndCursor,
@@ -86,18 +91,23 @@ func (h *handlers) getRisk(ctx context.Context, _ *mcp.CallToolRequest, in getIn
 			item.Remediations = h.fetchRemediations(ctx, &graphclient.RemediationWhereInput{HasRisksWith: riskWhere})
 		},
 	)
+	if err := h.enrichRiskAssignees(ctx, &item, nil); err != nil {
+		return nil, riskItem{}, err
+	}
 	return nil, item, nil
 }
 
 func mapListRisk(n *graphclient.GetRisks_Risks_Edges_Node) riskItem {
 	return riskItem{
-		ID:         n.ID,
-		DisplayID:  n.DisplayID,
-		Name:       n.Name,
-		Status:     openlane.Format(n.Status),
-		Impact:     openlane.Format(n.Impact),
-		Likelihood: openlane.Format(n.Likelihood),
-		Score:      n.Score,
+		ID:            n.ID,
+		DisplayID:     n.DisplayID,
+		Name:          n.Name,
+		Status:        openlane.Format(n.Status),
+		Impact:        openlane.Format(n.Impact),
+		Likelihood:    openlane.Format(n.Likelihood),
+		Score:         n.Score,
+		StakeholderID: openlane.Deref(n.StakeholderID),
+		DelegateID:    openlane.Deref(n.DelegateID),
 	}
 }
 

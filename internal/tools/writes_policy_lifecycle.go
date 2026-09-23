@@ -24,8 +24,10 @@ type policyLifecycleResult struct {
 	DisplayID        string `json:"display_id,omitempty"`
 	Name             string `json:"name,omitempty"`
 	ApprovalRequired bool   `json:"approval_required"`
-	ApproverID       string `json:"approver_id,omitempty"`
-	DelegateID       string `json:"delegate_id,omitempty"`
+	ApproverID       string                `json:"approver_id,omitempty"`
+	Approver         *groupAssigneeSummary `json:"approver,omitempty"`
+	DelegateID       string                `json:"delegate_id,omitempty"`
+	Delegate         *groupAssigneeSummary `json:"delegate,omitempty"`
 	CurrentStatus    string `json:"current_status"`
 	RequestedStatus  string `json:"requested_status"`
 	ResultStatus     string `json:"result_status,omitempty"`
@@ -102,6 +104,9 @@ func (h *handlers) transitionPolicy(ctx context.Context, in policyLifecycleInput
 		CurrentStatus:    current,
 		RequestedStatus:  target,
 		Summary:          fmt.Sprintf("Would %s %q from %s to %s", verb, p.Name, current, target),
+	}
+	if err := h.enrichPolicyLifecycleAssignees(ctx, &out); err != nil {
+		return nil, policyLifecycleResult{}, err
 	}
 	if !in.Confirm {
 		out.Error = errConfirmationRequired

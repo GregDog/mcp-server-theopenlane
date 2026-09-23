@@ -33,7 +33,12 @@ type fakeAPI struct {
 	lastCreateEvidenceInput graphclient.CreateEvidenceInput
 	lastUpdateEvidenceInput graphclient.UpdateEvidenceInput
 	lastUpdateControlInput  graphclient.UpdateControlInput
+	lastUpdateRiskInput     graphclient.UpdateRiskInput
+	lastUpdatePolicyInput   graphclient.UpdateInternalPolicyInput
 	lastControlWhere        *graphclient.ControlWhereInput
+
+	risk  *graphclient.GetRiskByID
+	risks *graphclient.GetRisks
 }
 
 func (f *fakeAPI) GetControls(ctx context.Context, first *int64, after *string, where *graphclient.ControlWhereInput) (*graphclient.GetControls, error) {
@@ -75,10 +80,22 @@ func (f *fakeAPI) GetInternalPolicyByID(_ context.Context, id string) (*graphcli
 	}
 	return nil, errors.New("unused")
 }
-func (f *fakeAPI) GetRisks(context.Context, *int64, *string, *graphclient.RiskWhereInput) (*graphclient.GetRisks, error) {
+func (f *fakeAPI) GetRisks(_ context.Context, _ *int64, _ *string, _ *graphclient.RiskWhereInput) (*graphclient.GetRisks, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	if f.risks != nil {
+		return f.risks, nil
+	}
 	return nil, errors.New("unused")
 }
-func (f *fakeAPI) GetRiskByID(context.Context, string) (*graphclient.GetRiskByID, error) {
+func (f *fakeAPI) GetRiskByID(_ context.Context, _ string) (*graphclient.GetRiskByID, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	if f.risk != nil {
+		return f.risk, nil
+	}
 	return nil, errors.New("unused")
 }
 func (f *fakeAPI) GetStandards(context.Context, *int64, *string, *graphclient.StandardWhereInput) (*graphclient.GetStandards, error) {

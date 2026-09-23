@@ -15,7 +15,7 @@ func TestResolveControlAssigneeGroupIDUsesGroupID(t *testing.T) {
 		},
 	}
 	h := &handlers{api: api}
-	got, err := h.resolveControlAssigneeGroupID(context.Background(), groupID)
+	got, err := h.resolveGroupAssigneeGroupID(context.Background(), groupID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -43,7 +43,7 @@ func TestResolveControlAssigneeGroupIDResolvesUserToManagedGroup(t *testing.T) {
 		},
 	}
 	h := &handlers{api: api}
-	got, err := h.resolveControlAssigneeGroupID(context.Background(), userID)
+	got, err := h.resolveGroupAssigneeGroupID(context.Background(), userID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -216,6 +216,138 @@ func TestGetControlEnrichesDelegate(t *testing.T) {
 	}
 	if item.ControlOwner == nil || item.ControlOwner.UserID != userID {
 		t.Fatalf("control owner: %+v", item.ControlOwner)
+	}
+}
+
+func TestUpdateRiskResolvesStakeholderAndDelegate(t *testing.T) {
+	userID := "01USERUSERUSERUSERUSERU07"
+	stakeholderGroup := "01GROUPGROUPGROUPGROUPGR09"
+	delegateGroup := "01GROUPGROUPGROUPGROUPGR10"
+	api := &fakeAPI{
+		groups: &graphclient.GetGroups{
+			Groups: graphclient.GetGroups_Groups{
+				Edges: []*graphclient.GetGroups_Groups_Edges{
+					{
+						Node: &graphclient.GetGroups_Groups_Edges_Node{
+							ID:   stakeholderGroup,
+							Name: "bob - " + userID,
+						},
+					},
+				},
+			},
+		},
+		groupsByID: map[string]graphclient.GetGroupByID_Group{
+			stakeholderGroup: {ID: stakeholderGroup, Name: "bob - " + userID},
+			delegateGroup:    {ID: delegateGroup, Name: "delegate"},
+		},
+	}
+	h := &handlers{api: api, allowWrite: true}
+	_, _, err := h.updateRisk(context.Background(), nil, updateRiskInput{
+		ID:            "risk_1",
+		StakeholderID: userID,
+		DelegateID:    delegateGroup,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if api.lastUpdateRiskInput.StakeholderID == nil || *api.lastUpdateRiskInput.StakeholderID != stakeholderGroup {
+		t.Fatalf("stakeholder: %+v", api.lastUpdateRiskInput.StakeholderID)
+	}
+	if api.lastUpdateRiskInput.DelegateID == nil || *api.lastUpdateRiskInput.DelegateID != delegateGroup {
+		t.Fatalf("delegate: %+v", api.lastUpdateRiskInput.DelegateID)
+	}
+}
+
+func TestUpdatePolicyResolvesApproverAndDelegate(t *testing.T) {
+	userID := "01USERUSERUSERUSERUSERU08"
+	approverGroup := "01GROUPGROUPGROUPGROUPGR11"
+	delegateGroup := "01GROUPGROUPGROUPGROUPGR12"
+	api := &fakeAPI{
+		groups: &graphclient.GetGroups{
+			Groups: graphclient.GetGroups_Groups{
+				Edges: []*graphclient.GetGroups_Groups_Edges{
+					{
+						Node: &graphclient.GetGroups_Groups_Edges_Node{
+							ID:   approverGroup,
+							Name: "carol - " + userID,
+						},
+					},
+				},
+			},
+		},
+		groupsByID: map[string]graphclient.GetGroupByID_Group{
+			approverGroup: {ID: approverGroup, Name: "carol - " + userID},
+			delegateGroup: {ID: delegateGroup, Name: "delegate"},
+		},
+	}
+	h := &handlers{api: api, allowWrite: true}
+	_, _, err := h.updatePolicy(context.Background(), nil, updatePolicyInput{
+		ID:         "policy_1",
+		ApproverID: userID,
+		DelegateID: delegateGroup,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if api.lastUpdatePolicyInput.ApproverID == nil || *api.lastUpdatePolicyInput.ApproverID != approverGroup {
+		t.Fatalf("approver: %+v", api.lastUpdatePolicyInput.ApproverID)
+	}
+	if api.lastUpdatePolicyInput.DelegateID == nil || *api.lastUpdatePolicyInput.DelegateID != delegateGroup {
+		t.Fatalf("delegate: %+v", api.lastUpdatePolicyInput.DelegateID)
+	}
+}
+
+func TestGetRiskEnrichesStakeholder(t *testing.T) {
+	userID := "01USERUSERUSERUSERUSERU09"
+	groupID := "01GROUPGROUPGROUPGROUPGR13"
+	api := &fakeAPI{
+		controls: emptyControls(),
+		risk: &graphclient.GetRiskByID{
+			Risk: graphclient.GetRiskByID_Risk{
+				ID:            "risk_1",
+				Name:          "Vendor outage",
+				StakeholderID: &groupID,
+			},
+		},
+		groupsByID: map[string]graphclient.GetGroupByID_Group{
+			groupID: {
+				ID:          groupID,
+				Name:        "dana - " + userID,
+				DisplayName: "dana",
+				IsManaged:   boolPtr(true),
+			},
+		},
+		orgMembers: &graphclient.GetOrgMembersByOrgID{
+			OrgMemberships: graphclient.GetOrgMembersByOrgID_OrgMemberships{
+				Edges: []*graphclient.GetOrgMembersByOrgID_OrgMemberships_Edges{
+					{
+						Node: &graphclient.GetOrgMembersByOrgID_OrgMemberships_Edges_Node{
+							User: graphclient.GetOrgMembersByOrgID_OrgMemberships_Edges_Node_User{
+								ID:          userID,
+								DisplayName: "Dana Example",
+								Email:       "dana@example.com",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	h := &handlers{api: api, organizationID: "org_1"}
+	_, item, err := h.getRisk(context.Background(), nil, getInput{ID: "risk_1"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if item.Stakeholder == nil || item.Stakeholder.UserEmail != "dana@example.com" {
+		t.Fatalf("stakeholder: %+v", item.Stakeholder)
+	}
+}
+
+func emptyControls() *graphclient.GetControls {
+	return &graphclient.GetControls{
+		Controls: graphclient.GetControls_Controls{
+			Edges: []*graphclient.GetControls_Controls_Edges{},
+		},
 	}
 }
 

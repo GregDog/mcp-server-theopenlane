@@ -10,14 +10,16 @@ import (
 )
 
 type createRiskInput struct {
-	Name       string   `json:"name" jsonschema:"Risk name."`
-	Status     string   `json:"status,omitempty" jsonschema:"Risk status enum value."`
-	Impact     string   `json:"impact,omitempty" jsonschema:"Risk impact enum value."`
-	Likelihood string   `json:"likelihood,omitempty" jsonschema:"Risk likelihood enum value."`
-	Details    string   `json:"details,omitempty" jsonschema:"Risk details."`
-	Mitigation string   `json:"mitigation,omitempty" jsonschema:"Risk mitigation."`
-	Tags       []string `json:"tags,omitempty" jsonschema:"Tags to apply."`
-	EntityIDs  []string `json:"entity_ids,omitempty" jsonschema:"Entity (vendor) IDs to associate with this risk on create."`
+	Name          string   `json:"name" jsonschema:"Risk name."`
+	Status        string   `json:"status,omitempty" jsonschema:"Risk status enum value."`
+	Impact        string   `json:"impact,omitempty" jsonschema:"Risk impact enum value."`
+	Likelihood    string   `json:"likelihood,omitempty" jsonschema:"Risk likelihood enum value."`
+	Details       string   `json:"details,omitempty" jsonschema:"Risk details."`
+	Mitigation    string   `json:"mitigation,omitempty" jsonschema:"Risk mitigation."`
+	Tags          []string `json:"tags,omitempty" jsonschema:"Tags to apply."`
+	EntityIDs     []string `json:"entity_ids,omitempty" jsonschema:"Entity (vendor) IDs to associate with this risk on create."`
+	StakeholderID string   `json:"stakeholder_id,omitempty" jsonschema:"Risk stakeholder: user ID, email, name, or group ID. User identifiers resolve to the member's managed personal group (Openlane stakeholderID)."`
+	DelegateID    string   `json:"delegate_id,omitempty" jsonschema:"Risk delegate: user ID, email, name, or group ID. User identifiers resolve to the member's managed personal group (Openlane delegateID)."`
 }
 
 type updateRiskInput struct {
@@ -31,6 +33,8 @@ type updateRiskInput struct {
 	Tags            []string `json:"tags,omitempty" jsonschema:"Replace tags with this list."`
 	AddEntityIDs    []string `json:"add_entity_ids,omitempty" jsonschema:"Entity (vendor) IDs to associate with this risk."`
 	RemoveEntityIDs []string `json:"remove_entity_ids,omitempty" jsonschema:"Entity (vendor) IDs to unlink from this risk without deleting the risk record."`
+	StakeholderID   string   `json:"stakeholder_id,omitempty" jsonschema:"Updated risk stakeholder: user ID, email, name, or group ID. User identifiers resolve to the member's managed personal group (Openlane stakeholderID)."`
+	DelegateID      string   `json:"delegate_id,omitempty" jsonschema:"Updated risk delegate: user ID, email, name, or group ID. User identifiers resolve to the member's managed personal group (Openlane delegateID)."`
 }
 
 func registerWriteRisks(server *mcp.Server, h *handlers) {
@@ -75,12 +79,30 @@ func (h *handlers) createRisk(ctx context.Context, _ *mcp.CallToolRequest, in cr
 	if len(in.EntityIDs) > 0 {
 		input.EntityIDs = in.EntityIDs
 	}
+	if in.StakeholderID != "" {
+		stakeholderGroupID, err := h.resolveGroupAssigneeGroupID(ctx, in.StakeholderID)
+		if err != nil {
+			return nil, riskItem{}, err
+		}
+		input.StakeholderID = &stakeholderGroupID
+	}
+	if in.DelegateID != "" {
+		delegateGroupID, err := h.resolveGroupAssigneeGroupID(ctx, in.DelegateID)
+		if err != nil {
+			return nil, riskItem{}, err
+		}
+		input.DelegateID = &delegateGroupID
+	}
 
 	resp, err := h.api.CreateRisk(ctx, input)
 	if err != nil {
 		return nil, riskItem{}, openlane.APIError(err)
 	}
-	return nil, mapCreatedRisk(resp.CreateRisk.Risk), nil
+	item := mapCreatedRisk(resp.CreateRisk.Risk)
+	if err := h.enrichRiskAssignees(ctx, &item, nil); err != nil {
+		return nil, riskItem{}, err
+	}
+	return nil, item, nil
 }
 
 func (h *handlers) updateRisk(ctx context.Context, _ *mcp.CallToolRequest, in updateRiskInput) (*mcp.CallToolResult, riskItem, error) {
@@ -115,6 +137,20 @@ func (h *handlers) updateRisk(ctx context.Context, _ *mcp.CallToolRequest, in up
 	if len(in.RemoveEntityIDs) > 0 {
 		input.RemoveEntityIDs = in.RemoveEntityIDs
 	}
+	if in.StakeholderID != "" {
+		stakeholderGroupID, err := h.resolveGroupAssigneeGroupID(ctx, in.StakeholderID)
+		if err != nil {
+			return nil, riskItem{}, err
+		}
+		input.StakeholderID = &stakeholderGroupID
+	}
+	if in.DelegateID != "" {
+		delegateGroupID, err := h.resolveGroupAssigneeGroupID(ctx, in.DelegateID)
+		if err != nil {
+			return nil, riskItem{}, err
+		}
+		input.DelegateID = &delegateGroupID
+	}
 	if isEmptyUpdateRisk(input) {
 		return nil, riskItem{}, errUpdateFieldsRequired
 	}
@@ -123,34 +159,42 @@ func (h *handlers) updateRisk(ctx context.Context, _ *mcp.CallToolRequest, in up
 	if err != nil {
 		return nil, riskItem{}, openlane.APIError(err)
 	}
-	return nil, mapUpdatedRisk(resp.UpdateRisk.Risk), nil
+	item := mapUpdatedRisk(resp.UpdateRisk.Risk)
+	if err := h.enrichRiskAssignees(ctx, &item, nil); err != nil {
+		return nil, riskItem{}, err
+	}
+	return nil, item, nil
 }
 
 func mapCreatedRisk(r graphclient.CreateRisk_CreateRisk_Risk) riskItem {
 	return riskItem{
-		ID:         r.ID,
-		DisplayID:  r.DisplayID,
-		Name:       r.Name,
-		Status:     openlane.Format(r.Status),
-		Impact:     openlane.Format(r.Impact),
-		Likelihood: openlane.Format(r.Likelihood),
-		Score:      r.Score,
-		Details:    openlane.Deref(r.Details),
-		Mitigation: openlane.Deref(r.Mitigation),
+		ID:            r.ID,
+		DisplayID:     r.DisplayID,
+		Name:          r.Name,
+		Status:        openlane.Format(r.Status),
+		Impact:        openlane.Format(r.Impact),
+		Likelihood:    openlane.Format(r.Likelihood),
+		Score:         r.Score,
+		Details:       openlane.Deref(r.Details),
+		Mitigation:    openlane.Deref(r.Mitigation),
+		StakeholderID: openlane.Deref(r.StakeholderID),
+		DelegateID:    openlane.Deref(r.DelegateID),
 	}
 }
 
 func mapUpdatedRisk(r graphclient.UpdateRisk_UpdateRisk_Risk) riskItem {
 	return riskItem{
-		ID:         r.ID,
-		DisplayID:  r.DisplayID,
-		Name:       r.Name,
-		Status:     openlane.Format(r.Status),
-		Impact:     openlane.Format(r.Impact),
-		Likelihood: openlane.Format(r.Likelihood),
-		Score:      r.Score,
-		Details:    openlane.Deref(r.Details),
-		Mitigation: openlane.Deref(r.Mitigation),
+		ID:            r.ID,
+		DisplayID:     r.DisplayID,
+		Name:          r.Name,
+		Status:        openlane.Format(r.Status),
+		Impact:        openlane.Format(r.Impact),
+		Likelihood:    openlane.Format(r.Likelihood),
+		Score:         r.Score,
+		Details:       openlane.Deref(r.Details),
+		Mitigation:    openlane.Deref(r.Mitigation),
+		StakeholderID: openlane.Deref(r.StakeholderID),
+		DelegateID:    openlane.Deref(r.DelegateID),
 	}
 }
 
@@ -163,5 +207,7 @@ func isEmptyUpdateRisk(in graphclient.UpdateRiskInput) bool {
 		in.Mitigation == nil &&
 		len(in.Tags) == 0 &&
 		len(in.AddEntityIDs) == 0 &&
-		len(in.RemoveEntityIDs) == 0
+		len(in.RemoveEntityIDs) == 0 &&
+		in.StakeholderID == nil &&
+		in.DelegateID == nil
 }

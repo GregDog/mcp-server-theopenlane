@@ -8,8 +8,8 @@ Openlane uses **three different ID meanings** that MCP tools and agents often co
 | --- | --- | --- | --- |
 | `owner_id` on controls, evidence, programs, risks (read) | `ownerID` | **Organization ID** | Which org owns the record. On controls: set on program-imported copies; required for evidence linking (`linkable_to_evidence: true`). **Not a person.** |
 | `control_owner_id`, `delegate_id` on controls | `controlOwnerID`, `delegateID` | **Group ID** | Responsibility assignment. Usually a **managed personal group** (`{displayName} - {userID}`). **Not a user ID.** |
-| `owner_id`, `delegate_id`, `stakeholder_id` on risks (read) | `stakeholderID`, `delegateID` | **Group ID** | Risk oversight / delegate groups. MCP does not expose write fields for these yet. |
-| `approver_id`, `delegate_id` on policies (lifecycle preview) | `approverID`, `delegateID` | **Group ID** | Native policy approval. MCP lifecycle tools do not set these. |
+| `stakeholder_id`, `delegate_id` on risks | `stakeholderID`, `delegateID` | **Group ID** | Risk oversight / delegate groups. |
+| `approver_id`, `delegate_id` on policies | `approverID`, `delegateID` | **Group ID** | Native policy approval groups. |
 | `openlane_users_list` / `openlane_user_get` | User | **User ID** | Org members only. **Cannot look up group IDs.** |
 | Workflow `USER` target | user id | **User ID** | Correct as-is. |
 | Workflow `GROUP` target | group id | **Group ID** | Use `openlane_groups_list` or `group_name`. |
@@ -20,12 +20,12 @@ Passing a **user ID** to Openlane `controlOwnerID` / `delegateID` returns `UNAUT
 
 | Surface | Write: user → group resolution | Read: group → user enrichment |
 | --- | --- | --- |
-| **Controls** (`openlane_control_create` / `openlane_control_update`) | Yes — `owner_id` / `delegate_id` accept user id, email, name, or group id | Yes — `control_owner` and `delegate` objects on list/search/get/update |
-| **Risks** | No assignee write fields | No — raw `delegate_id` / `stakeholder_id` only |
-| **Policies** | No approver/delegate write fields | Lifecycle preview exposes raw group ids only |
+| **Controls** (`openlane_control_create` / `openlane_control_update`) | Yes — `owner_id` / `delegate_id` | Yes — `control_owner` and `delegate` on list/search/get/update |
+| **Risks** (`openlane_risk_create` / `openlane_risk_update`) | Yes — `stakeholder_id` / `delegate_id` | Yes — `stakeholder` and `delegate` on list/get/create/update |
+| **Policies** (`openlane_policy_create` / `openlane_policy_update`) | Yes — `approver_id` / `delegate_id` | Yes — `approver` and `delegate` on list/get/create/update; lifecycle preview too |
 | **Workflows** | USER vs GROUP targets resolved separately | N/A |
 
-Helpers live in `internal/tools/control_assignees.go`. When adding risk/policy assignee writes or read enrichment, **reuse** `resolveControlAssigneeGroupID` and `resolveGroupAssigneeSummary` — do not duplicate the pattern.
+Helpers live in `internal/tools/control_assignees.go` (`resolveGroupAssigneeGroupID`, `resolveGroupAssigneeSummary`). Reuse them for any new assignee fields — do not duplicate the pattern.
 
 ## Control writes (agents)
 

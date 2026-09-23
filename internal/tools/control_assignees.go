@@ -11,8 +11,8 @@ import (
 )
 
 // Assignee helpers for Openlane fields that store group IDs (controlOwnerID, delegateID,
-// and the same pattern on risks/policies). Not global yet — only wired for controls.
-// See docs/openlane-assignee-ids.md before adding risk/policy assignee tools.
+// stakeholderID, approverID, and the same pattern on risks/policies).
+// See docs/openlane-assignee-ids.md.
 //
 // groupAssigneeSummary resolves Openlane controlOwnerID/delegateID group ids to names and users.
 type groupAssigneeSummary struct {
@@ -24,9 +24,9 @@ type groupAssigneeSummary struct {
 	UserEmail        string `json:"user_email,omitempty"`
 }
 
-// resolveControlAssigneeGroupID maps a user id/email/name or group id/name to the
-// Openlane group id required by controlOwnerID and delegateID on UpdateControl.
-func (h *handlers) resolveControlAssigneeGroupID(ctx context.Context, assignee string) (string, error) {
+// resolveGroupAssigneeGroupID maps a user id/email/name or group id/name to the
+// Openlane group id required by controlOwnerID, delegateID, stakeholderID, and approverID.
+func (h *handlers) resolveGroupAssigneeGroupID(ctx context.Context, assignee string) (string, error) {
 	s := strings.TrimSpace(assignee)
 	if s == "" {
 		return "", fmt.Errorf("assignee is required")
@@ -191,6 +191,92 @@ func enrichControlPageAssignees(ctx context.Context, h *handlers, items []contro
 			return err
 		}
 	}
+	return nil
+}
+
+func (h *handlers) enrichRiskAssignees(ctx context.Context, item *riskItem, cache map[string]groupAssigneeSummary) error {
+	if item == nil {
+		return nil
+	}
+	if item.StakeholderID != "" {
+		summary, err := h.resolveGroupAssigneeSummary(ctx, item.StakeholderID, cache)
+		if err != nil {
+			return err
+		}
+		if summary.GroupID != "" {
+			item.Stakeholder = &summary
+		}
+	}
+	if item.DelegateID != "" {
+		summary, err := h.resolveGroupAssigneeSummary(ctx, item.DelegateID, cache)
+		if err != nil {
+			return err
+		}
+		if summary.GroupID != "" {
+			item.Delegate = &summary
+		}
+	}
+	return nil
+}
+
+func enrichRiskPageAssignees(ctx context.Context, h *handlers, items []riskItem) error {
+	cache := make(map[string]groupAssigneeSummary)
+	for i := range items {
+		if err := h.enrichRiskAssignees(ctx, &items[i], cache); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (h *handlers) enrichPolicyAssignees(ctx context.Context, item *policyItem, cache map[string]groupAssigneeSummary) error {
+	if item == nil {
+		return nil
+	}
+	if item.ApproverID != "" {
+		summary, err := h.resolveGroupAssigneeSummary(ctx, item.ApproverID, cache)
+		if err != nil {
+			return err
+		}
+		if summary.GroupID != "" {
+			item.Approver = &summary
+		}
+	}
+	if item.DelegateID != "" {
+		summary, err := h.resolveGroupAssigneeSummary(ctx, item.DelegateID, cache)
+		if err != nil {
+			return err
+		}
+		if summary.GroupID != "" {
+			item.Delegate = &summary
+		}
+	}
+	return nil
+}
+
+func enrichPolicyPageAssignees(ctx context.Context, h *handlers, items []policyItem) error {
+	cache := make(map[string]groupAssigneeSummary)
+	for i := range items {
+		if err := h.enrichPolicyAssignees(ctx, &items[i], cache); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (h *handlers) enrichPolicyLifecycleAssignees(ctx context.Context, out *policyLifecycleResult) error {
+	if out == nil {
+		return nil
+	}
+	item := policyItem{
+		ApproverID: out.ApproverID,
+		DelegateID: out.DelegateID,
+	}
+	if err := h.enrichPolicyAssignees(ctx, &item, nil); err != nil {
+		return err
+	}
+	out.Approver = item.Approver
+	out.Delegate = item.Delegate
 	return nil
 }
 
