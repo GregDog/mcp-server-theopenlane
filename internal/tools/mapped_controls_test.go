@@ -11,7 +11,7 @@ import (
 func TestCreateMappedControlRequiresEndpoints(t *testing.T) {
 	h := &handlers{api: &fakeAPI{}, allowWrite: true}
 	_, _, err := h.createMappedControl(context.Background(), nil, createMappedControlInput{
-		MappingType: "EQUAL",
+		MappingType:  "EQUAL",
 		ToControlIDs: []string{"ctrl_2"},
 	})
 	if err == nil {

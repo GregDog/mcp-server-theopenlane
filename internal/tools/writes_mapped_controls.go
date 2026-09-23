@@ -13,36 +13,36 @@ import (
 )
 
 type createMappedControlInput struct {
-	MappingType           string   `json:"mapping_type" jsonschema:"Mapping type: EQUAL, SUPERSET, SUBSET, INTERSECT, or PARTIAL."`
-	Relation              string   `json:"relation,omitempty" jsonschema:"Description of how the controls are related."`
-	Confidence            *int64   `json:"confidence,omitempty" jsonschema:"Confidence score from 0 to 100."`
-	Source                string   `json:"source,omitempty" jsonschema:"Mapping source: MANUAL, SUGGESTED, or IMPORTED."`
-	Tags                  []string `json:"tags,omitempty" jsonschema:"Tags to apply."`
-	FromControlIDs        []string `json:"from_control_ids,omitempty" jsonschema:"Source-side control IDs."`
-	ToControlIDs          []string `json:"to_control_ids,omitempty" jsonschema:"Target-side control IDs."`
-	FromSubcontrolIDs     []string `json:"from_subcontrol_ids,omitempty" jsonschema:"Source-side subcontrol IDs."`
-	ToSubcontrolIDs       []string `json:"to_subcontrol_ids,omitempty" jsonschema:"Target-side subcontrol IDs."`
-	FromControlRefCodes   []string `json:"from_control_ref_codes,omitempty" jsonschema:"Source-side control ref codes prefixed with standard, e.g. PCI DSS::12.6.2."`
-	ToControlRefCodes     []string `json:"to_control_ref_codes,omitempty" jsonschema:"Target-side control ref codes prefixed with standard."`
+	MappingType            string   `json:"mapping_type" jsonschema:"Mapping type: EQUAL, SUPERSET, SUBSET, INTERSECT, or PARTIAL."`
+	Relation               string   `json:"relation,omitempty" jsonschema:"Description of how the controls are related."`
+	Confidence             *int64   `json:"confidence,omitempty" jsonschema:"Confidence score from 0 to 100."`
+	Source                 string   `json:"source,omitempty" jsonschema:"Mapping source: MANUAL, SUGGESTED, or IMPORTED."`
+	Tags                   []string `json:"tags,omitempty" jsonschema:"Tags to apply."`
+	FromControlIDs         []string `json:"from_control_ids,omitempty" jsonschema:"Source-side control IDs."`
+	ToControlIDs           []string `json:"to_control_ids,omitempty" jsonschema:"Target-side control IDs."`
+	FromSubcontrolIDs      []string `json:"from_subcontrol_ids,omitempty" jsonschema:"Source-side subcontrol IDs."`
+	ToSubcontrolIDs        []string `json:"to_subcontrol_ids,omitempty" jsonschema:"Target-side subcontrol IDs."`
+	FromControlRefCodes    []string `json:"from_control_ref_codes,omitempty" jsonschema:"Source-side control ref codes prefixed with standard, e.g. PCI DSS::12.6.2."`
+	ToControlRefCodes      []string `json:"to_control_ref_codes,omitempty" jsonschema:"Target-side control ref codes prefixed with standard."`
 	FromSubcontrolRefCodes []string `json:"from_subcontrol_ref_codes,omitempty" jsonschema:"Source-side subcontrol ref codes prefixed with standard."`
-	ToSubcontrolRefCodes  []string `json:"to_subcontrol_ref_codes,omitempty" jsonschema:"Target-side subcontrol ref codes prefixed with standard."`
+	ToSubcontrolRefCodes   []string `json:"to_subcontrol_ref_codes,omitempty" jsonschema:"Target-side subcontrol ref codes prefixed with standard."`
 }
 
 type updateMappedControlInput struct {
-	ID                    string   `json:"id" jsonschema:"MappedControl ID to update."`
-	MappingType           string   `json:"mapping_type,omitempty" jsonschema:"Updated mapping type."`
-	Relation              string   `json:"relation,omitempty" jsonschema:"Updated relation description."`
-	Confidence            *int64   `json:"confidence,omitempty" jsonschema:"Updated confidence score from 0 to 100."`
-	Source                string   `json:"source,omitempty" jsonschema:"Updated mapping source."`
-	Tags                  []string `json:"tags,omitempty" jsonschema:"Replace tags with this list."`
-	AddFromControlIDs     []string `json:"add_from_control_ids,omitempty" jsonschema:"Control IDs to add on the source side."`
-	RemoveFromControlIDs  []string `json:"remove_from_control_ids,omitempty" jsonschema:"Control IDs to remove from the source side."`
-	AddToControlIDs       []string `json:"add_to_control_ids,omitempty" jsonschema:"Control IDs to add on the target side."`
-	RemoveToControlIDs    []string `json:"remove_to_control_ids,omitempty" jsonschema:"Control IDs to remove from the target side."`
-	AddFromSubcontrolIDs  []string `json:"add_from_subcontrol_ids,omitempty" jsonschema:"Subcontrol IDs to add on the source side."`
+	ID                      string   `json:"id" jsonschema:"MappedControl ID to update."`
+	MappingType             string   `json:"mapping_type,omitempty" jsonschema:"Updated mapping type."`
+	Relation                string   `json:"relation,omitempty" jsonschema:"Updated relation description."`
+	Confidence              *int64   `json:"confidence,omitempty" jsonschema:"Updated confidence score from 0 to 100."`
+	Source                  string   `json:"source,omitempty" jsonschema:"Updated mapping source."`
+	Tags                    []string `json:"tags,omitempty" jsonschema:"Replace tags with this list."`
+	AddFromControlIDs       []string `json:"add_from_control_ids,omitempty" jsonschema:"Control IDs to add on the source side."`
+	RemoveFromControlIDs    []string `json:"remove_from_control_ids,omitempty" jsonschema:"Control IDs to remove from the source side."`
+	AddToControlIDs         []string `json:"add_to_control_ids,omitempty" jsonschema:"Control IDs to add on the target side."`
+	RemoveToControlIDs      []string `json:"remove_to_control_ids,omitempty" jsonschema:"Control IDs to remove from the target side."`
+	AddFromSubcontrolIDs    []string `json:"add_from_subcontrol_ids,omitempty" jsonschema:"Subcontrol IDs to add on the source side."`
 	RemoveFromSubcontrolIDs []string `json:"remove_from_subcontrol_ids,omitempty" jsonschema:"Subcontrol IDs to remove from the source side."`
-	AddToSubcontrolIDs    []string `json:"add_to_subcontrol_ids,omitempty" jsonschema:"Subcontrol IDs to add on the target side."`
-	RemoveToSubcontrolIDs []string `json:"remove_to_subcontrol_ids,omitempty" jsonschema:"Subcontrol IDs to remove from the target side."`
+	AddToSubcontrolIDs      []string `json:"add_to_subcontrol_ids,omitempty" jsonschema:"Subcontrol IDs to add on the target side."`
+	RemoveToSubcontrolIDs   []string `json:"remove_to_subcontrol_ids,omitempty" jsonschema:"Subcontrol IDs to remove from the target side."`
 }
 
 func registerWriteMappedControls(server *mcp.Server, h *handlers) {
@@ -72,16 +72,16 @@ func (h *handlers) createMappedControl(ctx context.Context, _ *mcp.CallToolReque
 		return nil, mappedControlItem{}, fmt.Errorf("at least one to_control_ids, to_subcontrol_ids, to_control_ref_codes, or to_subcontrol_ref_codes value is required")
 	}
 	input := graphclient.CreateMappedControlInput{
-		Tags:                  in.Tags,
-		MappingType:           mappingType(in.MappingType),
-		FromControlIDs:        in.FromControlIDs,
-		ToControlIDs:          in.ToControlIDs,
-		FromSubcontrolIDs:     in.FromSubcontrolIDs,
-		ToSubcontrolIDs:       in.ToSubcontrolIDs,
-		FromControlRefCodes:   in.FromControlRefCodes,
-		ToControlRefCodes:     in.ToControlRefCodes,
+		Tags:                   in.Tags,
+		MappingType:            mappingType(in.MappingType),
+		FromControlIDs:         in.FromControlIDs,
+		ToControlIDs:           in.ToControlIDs,
+		FromSubcontrolIDs:      in.FromSubcontrolIDs,
+		ToSubcontrolIDs:        in.ToSubcontrolIDs,
+		FromControlRefCodes:    in.FromControlRefCodes,
+		ToControlRefCodes:      in.ToControlRefCodes,
 		FromSubcontrolRefCodes: in.FromSubcontrolRefCodes,
-		ToSubcontrolRefCodes:  in.ToSubcontrolRefCodes,
+		ToSubcontrolRefCodes:   in.ToSubcontrolRefCodes,
 	}
 	if in.Relation != "" {
 		input.Relation = &in.Relation

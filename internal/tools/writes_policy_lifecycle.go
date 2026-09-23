@@ -18,20 +18,20 @@ type policyLifecycleInput struct {
 }
 
 type policyLifecycleResult struct {
-	Confirmed        bool   `json:"confirmed"`
-	Error            string `json:"error,omitempty"`
-	ID               string `json:"id"`
-	DisplayID        string `json:"display_id,omitempty"`
-	Name             string `json:"name,omitempty"`
-	ApprovalRequired bool   `json:"approval_required"`
+	Confirmed        bool                  `json:"confirmed"`
+	Error            string                `json:"error,omitempty"`
+	ID               string                `json:"id"`
+	DisplayID        string                `json:"display_id,omitempty"`
+	Name             string                `json:"name,omitempty"`
+	ApprovalRequired bool                  `json:"approval_required"`
 	ApproverID       string                `json:"approver_id,omitempty"`
 	Approver         *groupAssigneeSummary `json:"approver,omitempty"`
 	DelegateID       string                `json:"delegate_id,omitempty"`
 	Delegate         *groupAssigneeSummary `json:"delegate,omitempty"`
-	CurrentStatus    string `json:"current_status"`
-	RequestedStatus  string `json:"requested_status"`
-	ResultStatus     string `json:"result_status,omitempty"`
-	Summary          string `json:"summary,omitempty"`
+	CurrentStatus    string                `json:"current_status"`
+	RequestedStatus  string                `json:"requested_status"`
+	ResultStatus     string                `json:"result_status,omitempty"`
+	Summary          string                `json:"summary,omitempty"`
 }
 
 func registerPolicyLifecycle(server *mcp.Server, h *handlers) {
