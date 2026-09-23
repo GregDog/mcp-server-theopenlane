@@ -4,6 +4,14 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-09-23
+
+### Added
+
+- `openlane_mapped_controls_list` / `openlane_mapped_control_get` for cross-framework control mappings (`MappedControl`)
+- `openlane_mapped_control_create` / `openlane_mapped_control_update` (write mode) and `openlane_mapped_control_delete` (delete mode)
+- `related_controls` summary on `openlane_control_get` with mapping id, type, direction, and linked control ref codes
+
 ## [0.7.0] - 2026-09-23
 
 ### Added

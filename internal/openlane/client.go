@@ -88,6 +88,11 @@ type GraphAPI interface {
 	UpdateTask(ctx context.Context, id string, input graphclient.UpdateTaskInput) (*graphclient.UpdateTask, error)
 	CreateEntity(ctx context.Context, input graphclient.CreateEntityInput, entityTypeName *string, logoFile *graphql.Upload) (*EntityDetail, error)
 	UpdateEntity(ctx context.Context, id string, input graphclient.UpdateEntityInput, logoFile *graphql.Upload) (*EntityDetail, error)
+	GetMappedControls(ctx context.Context, first *int64, after *string, where *graphclient.MappedControlWhereInput) (*graphclient.GetMappedControls, error)
+	GetMappedControlByID(ctx context.Context, id string) (*graphclient.GetMappedControlByID, error)
+	CreateMappedControl(ctx context.Context, input graphclient.CreateMappedControlInput) (*graphclient.CreateMappedControl, error)
+	UpdateMappedControl(ctx context.Context, id string, input graphclient.UpdateMappedControlInput) (*graphclient.UpdateMappedControl, error)
+	DeleteMappedControl(ctx context.Context, id string) (string, error)
 	DeleteControl(ctx context.Context, id string) (string, error)
 	DeleteEvidence(ctx context.Context, id string) (string, error)
 	DeleteInternalPolicy(ctx context.Context, id string) (string, error)
@@ -385,6 +390,30 @@ func (a *api) CreateTask(ctx context.Context, input graphclient.CreateTaskInput)
 
 func (a *api) UpdateTask(ctx context.Context, id string, input graphclient.UpdateTaskInput) (*graphclient.UpdateTask, error) {
 	return a.c.UpdateTask(ctx, id, input)
+}
+
+func (a *api) GetMappedControls(ctx context.Context, first *int64, after *string, where *graphclient.MappedControlWhereInput) (*graphclient.GetMappedControls, error) {
+	return a.c.GetMappedControls(ctx, first, nil, after, nil, where, nil)
+}
+
+func (a *api) GetMappedControlByID(ctx context.Context, id string) (*graphclient.GetMappedControlByID, error) {
+	return a.c.GetMappedControlByID(ctx, id)
+}
+
+func (a *api) CreateMappedControl(ctx context.Context, input graphclient.CreateMappedControlInput) (*graphclient.CreateMappedControl, error) {
+	return a.c.CreateMappedControl(ctx, input)
+}
+
+func (a *api) UpdateMappedControl(ctx context.Context, id string, input graphclient.UpdateMappedControlInput) (*graphclient.UpdateMappedControl, error) {
+	return a.c.UpdateMappedControl(ctx, id, input)
+}
+
+func (a *api) DeleteMappedControl(ctx context.Context, id string) (string, error) {
+	resp, err := a.c.DeleteMappedControl(ctx, id)
+	if err != nil {
+		return "", err
+	}
+	return resp.DeleteMappedControl.DeletedID, nil
 }
 
 func (a *api) DeleteControl(ctx context.Context, id string) (string, error) {

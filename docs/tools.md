@@ -192,6 +192,38 @@ Use `openlane_policies_awaiting_approval` to list both paths in one call. `openl
 
 Implementation get responses include control/subcontrol `ref_code` values (not control IDs in the generated client selection set).
 
+## Control mappings (MappedControl)
+
+| Tool | Openlane client |
+| --- | --- |
+| `openlane_mapped_controls_list` | `GetMappedControls` |
+| `openlane_mapped_control_get` | `GetMappedControlByID` |
+
+`openlane_mapped_controls_list` filters:
+
+| Field | Maps to |
+| --- | --- |
+| `control_id` | `hasFromControlsWith` OR `hasToControlsWith` |
+| `mapping_type` | `mappingType` |
+| `source` | `source` |
+
+`openlane_control_get` includes a bounded `related_controls` summary derived from `GetMappedControls` for the control id.
+
+Write tools (require `OPENLANE_ALLOW_WRITE`):
+
+| Tool | Openlane client |
+| --- | --- |
+| `openlane_mapped_control_create` | `CreateMappedControl` |
+| `openlane_mapped_control_update` | `UpdateMappedControl` |
+
+Delete tool (requires `OPENLANE_ALLOW_DELETE`):
+
+| Tool | Openlane client |
+| --- | --- |
+| `openlane_mapped_control_delete` | `DeleteMappedControl` |
+
+Create accepts control ids or prefixed ref codes (`PCI DSS::12.6.2`) on from/to sides. Mapping types: `EQUAL`, `SUPERSET`, `SUBSET`, `INTERSECT`, `PARTIAL`.
+
 ## Standards
 
 | Tool | Openlane client |

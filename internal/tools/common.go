@@ -88,6 +88,13 @@ type policyListInput struct {
 	Status string `json:"status,omitempty" jsonschema:"Filter by document status: DRAFT, NEEDS_APPROVAL, APPROVED, PUBLISHED, or ARCHIVED."`
 }
 
+type mappedControlListInput struct {
+	listInput
+	ControlID   string `json:"control_id,omitempty" jsonschema:"Filter mappings where this control appears on either side."`
+	MappingType string `json:"mapping_type,omitempty" jsonschema:"Filter by mapping type: EQUAL, SUPERSET, SUBSET, INTERSECT, or PARTIAL."`
+	Source      string `json:"source,omitempty" jsonschema:"Filter by mapping source: MANUAL, SUGGESTED, or IMPORTED."`
+}
+
 func readOnly() *mcp.ToolAnnotations {
 	destructive := false
 	openWorld := true

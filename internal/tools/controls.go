@@ -37,6 +37,7 @@ type controlItem struct {
 	Findings               *relSummary[findingRef]        `json:"findings,omitempty"`
 	Risks                  *relSummary[idNameRef]         `json:"risks,omitempty"`
 	Implementations        *relSummary[implementationRef] `json:"implementations,omitempty"`
+	RelatedControls        *relSummary[relatedControlRef] `json:"related_controls,omitempty"`
 }
 
 func registerControls(server *mcp.Server, h *handlers) {
@@ -57,7 +58,7 @@ func registerControls(server *mcp.Server, h *handlers) {
 	addTool(server, &mcp.Tool{
 		Name:        "openlane_control_get",
 		Title:       "Get an Openlane control",
-		Description: "Get a single control by ID with assessment metadata and bounded summaries of linked programs, evidence, findings, risks, and implementations.",
+		Description: "Get a single control by ID with assessment metadata and bounded summaries of linked programs, evidence, findings, risks, implementations, and cross-framework control mappings.",
 		Annotations: readOnly(),
 	}, h.getControl)
 }
@@ -128,6 +129,7 @@ func (h *handlers) getControl(ctx context.Context, _ *mcp.CallToolRequest, in ge
 		func() {
 			item.Implementations = h.fetchImplementations(ctx, &graphclient.ControlImplementationWhereInput{HasControlsWith: controlWhere})
 		},
+		func() { item.RelatedControls = h.fetchRelatedControls(ctx, in.ID) },
 	)
 	return nil, item, nil
 }

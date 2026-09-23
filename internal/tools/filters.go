@@ -96,6 +96,33 @@ func buildRiskWhere(in riskListInput) *graphclient.RiskWhereInput {
 	return &w
 }
 
+func buildMappedControlWhere(in mappedControlListInput) *graphclient.MappedControlWhereInput {
+	var w graphclient.MappedControlWhereInput
+	has := false
+	if s := strings.TrimSpace(in.ControlID); s != "" {
+		cw := []*graphclient.ControlWhereInput{{ID: &s}}
+		w.Or = []*graphclient.MappedControlWhereInput{
+			{HasFromControlsWith: cw},
+			{HasToControlsWith: cw},
+		}
+		has = true
+	}
+	if s := strings.TrimSpace(in.MappingType); s != "" {
+		mt := enums.MappingType(strings.ToUpper(s))
+		w.MappingType = &mt
+		has = true
+	}
+	if s := strings.TrimSpace(in.Source); s != "" {
+		src := enums.MappingSource(strings.ToUpper(s))
+		w.Source = &src
+		has = true
+	}
+	if !has {
+		return nil
+	}
+	return &w
+}
+
 func buildFindingWhere(in findingListInput) *graphclient.FindingWhereInput {
 	var w graphclient.FindingWhereInput
 	has := false

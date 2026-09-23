@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/theopenlane/core/common/enums"
 	"github.com/theopenlane/go-client/graphclient"
 
 	"github.com/GregDog/mcp-server-theopenlane/internal/openlane"
@@ -125,6 +126,91 @@ func (f *fakeAPI) CreateTask(context.Context, graphclient.CreateTaskInput) (*gra
 }
 func (f *fakeAPI) UpdateTask(context.Context, string, graphclient.UpdateTaskInput) (*graphclient.UpdateTask, error) {
 	return nil, errors.New("unused")
+}
+func (f *fakeAPI) GetMappedControls(_ context.Context, _ *int64, _ *string, where *graphclient.MappedControlWhereInput) (*graphclient.GetMappedControls, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	if f.mappedControls != nil {
+		return f.mappedControls, nil
+	}
+	return &graphclient.GetMappedControls{
+		MappedControls: graphclient.GetMappedControls_MappedControls{
+			Edges: []*graphclient.GetMappedControls_MappedControls_Edges{},
+		},
+	}, nil
+}
+func (f *fakeAPI) GetMappedControlByID(_ context.Context, id string) (*graphclient.GetMappedControlByID, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	if f.mappedControl != nil {
+		return f.mappedControl, nil
+	}
+	return nil, errors.New("unused")
+}
+func (f *fakeAPI) CreateMappedControl(_ context.Context, input graphclient.CreateMappedControlInput) (*graphclient.CreateMappedControl, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	f.lastCreateMappedControlInput = input
+	from := input.FromControlIDs
+	to := input.ToControlIDs
+	edgesFrom := make([]*graphclient.CreateMappedControl_CreateMappedControl_MappedControl_FromControls_Edges, 0, len(from))
+	for _, id := range from {
+		edgesFrom = append(edgesFrom, &graphclient.CreateMappedControl_CreateMappedControl_MappedControl_FromControls_Edges{
+			Node: &graphclient.CreateMappedControl_CreateMappedControl_MappedControl_FromControls_Edges_Node{ID: id},
+		})
+	}
+	edgesTo := make([]*graphclient.CreateMappedControl_CreateMappedControl_MappedControl_ToControls_Edges, 0, len(to))
+	for _, id := range to {
+		edgesTo = append(edgesTo, &graphclient.CreateMappedControl_CreateMappedControl_MappedControl_ToControls_Edges{
+			Node: &graphclient.CreateMappedControl_CreateMappedControl_MappedControl_ToControls_Edges_Node{ID: id},
+		})
+	}
+	mt := enums.MappingTypeEqual
+	if input.MappingType != nil {
+		mt = *input.MappingType
+	}
+	return &graphclient.CreateMappedControl{
+		CreateMappedControl: graphclient.CreateMappedControl_CreateMappedControl{
+			MappedControl: graphclient.CreateMappedControl_CreateMappedControl_MappedControl{
+				ID:          "map_1",
+				MappingType: mt,
+				FromControls: graphclient.CreateMappedControl_CreateMappedControl_MappedControl_FromControls{
+					Edges: edgesFrom,
+				},
+				ToControls: graphclient.CreateMappedControl_CreateMappedControl_MappedControl_ToControls{
+					Edges: edgesTo,
+				},
+			},
+		},
+	}, nil
+}
+func (f *fakeAPI) UpdateMappedControl(_ context.Context, id string, input graphclient.UpdateMappedControlInput) (*graphclient.UpdateMappedControl, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	f.lastUpdateMappedControlInput = input
+	mt := enums.MappingTypeEqual
+	if input.MappingType != nil {
+		mt = *input.MappingType
+	}
+	return &graphclient.UpdateMappedControl{
+		UpdateMappedControl: graphclient.UpdateMappedControl_UpdateMappedControl{
+			MappedControl: graphclient.UpdateMappedControl_UpdateMappedControl_MappedControl{
+				ID:          id,
+				MappingType: mt,
+			},
+		},
+	}, nil
+}
+func (f *fakeAPI) DeleteMappedControl(_ context.Context, id string) (string, error) {
+	if f.err != nil {
+		return "", f.err
+	}
+	f.deletedID = id
+	return id, nil
 }
 func (f *fakeAPI) DeleteControl(context.Context, string) (string, error) {
 	return "", errors.New("unused")

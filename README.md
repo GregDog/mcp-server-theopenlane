@@ -167,6 +167,8 @@ Tokens are never logged. See [docs/security.md](docs/security.md).
 | `openlane_assessment_get` | Get an assessment by ID |
 | `openlane_control_implementations_list` | List control implementations |
 | `openlane_control_implementation_get` | Get a control implementation by ID |
+| `openlane_mapped_controls_list` | List cross-framework control mappings (`MappedControl`) |
+| `openlane_mapped_control_get` | Get a control mapping by ID |
 | `openlane_standards_list` | List standards / frameworks |
 | `openlane_standard_get` | Get a standard by ID |
 | `openlane_tasks_list` | List tasks |
@@ -197,6 +199,7 @@ Write tools (require `OPENLANE_ALLOW_WRITE=true` or `--allow-write`):
 | Tool | Description |
 | --- | --- |
 | `openlane_control_create` / `openlane_control_update` | Create or update a control |
+| `openlane_mapped_control_create` / `openlane_mapped_control_update` | Create or update cross-framework control mappings (`MappedControl`) |
 | `openlane_evidence_create` / `openlane_evidence_update` | Create or update evidence; optional `control_ids` / `add_control_ids` / `remove_control_ids` (org-owned controls only — not system catalog copies); optional base64 file uploads |
 | `openlane_controls_list` / `openlane_controls_search` | Optional `linkable_only` returns org-owned controls suitable for evidence linking |
 | `openlane_policy_create` / `openlane_policy_update` | Create or update an internal policy |
@@ -215,6 +218,7 @@ Delete tools (require `OPENLANE_ALLOW_DELETE=true` or `--allow-delete`):
 | Tool | Description |
 | --- | --- |
 | `openlane_control_delete` | Delete a control by ID |
+| `openlane_mapped_control_delete` | Delete a control mapping by ID |
 | `openlane_evidence_delete` | Delete evidence by ID |
 | `openlane_policy_delete` | Delete a policy by ID |
 | `openlane_risk_delete` | Delete a risk by ID |

@@ -43,6 +43,13 @@ func registerDeletes(server *mcp.Server, h *handlers) {
 	}, h.deleteRisk)
 
 	addTool(server, &mcp.Tool{
+		Name:        "openlane_mapped_control_delete",
+		Title:       "Delete an Openlane control mapping",
+		Description: "Permanently delete a MappedControl by ID. Requires delete mode.",
+		Annotations: deleteAnnotations(),
+	}, h.deleteMappedControl)
+
+	addTool(server, &mcp.Tool{
 		Name:        "openlane_task_delete",
 		Title:       "Delete an Openlane task",
 		Description: "Permanently delete a task by ID. Requires delete mode.",
@@ -75,6 +82,10 @@ func (h *handlers) deleteRisk(ctx context.Context, _ *mcp.CallToolRequest, in ge
 
 func (h *handlers) deleteTask(ctx context.Context, _ *mcp.CallToolRequest, in getInput) (*mcp.CallToolResult, deleteResult, error) {
 	return h.deleteByID(ctx, in.ID, h.api.DeleteTask)
+}
+
+func (h *handlers) deleteMappedControl(ctx context.Context, _ *mcp.CallToolRequest, in getInput) (*mcp.CallToolResult, deleteResult, error) {
+	return h.deleteByID(ctx, in.ID, h.api.DeleteMappedControl)
 }
 
 type deleteWorkflowInput struct {

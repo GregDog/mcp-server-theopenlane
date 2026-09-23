@@ -39,6 +39,12 @@ type fakeAPI struct {
 
 	risk  *graphclient.GetRiskByID
 	risks *graphclient.GetRisks
+
+	mappedControl  *graphclient.GetMappedControlByID
+	mappedControls *graphclient.GetMappedControls
+
+	lastCreateMappedControlInput graphclient.CreateMappedControlInput
+	lastUpdateMappedControlInput graphclient.UpdateMappedControlInput
 }
 
 func (f *fakeAPI) GetControls(ctx context.Context, first *int64, after *string, where *graphclient.ControlWhereInput) (*graphclient.GetControls, error) {
