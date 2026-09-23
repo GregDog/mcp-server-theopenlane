@@ -18,7 +18,8 @@ type createControlInput struct {
 	Category           string   `json:"category,omitempty" jsonschema:"Control category."`
 	Subcategory        string   `json:"subcategory,omitempty" jsonschema:"Control subcategory."`
 	StandardID         string   `json:"standard_id,omitempty" jsonschema:"Associated standard ID."`
-	OwnerID            string   `json:"owner_id,omitempty" jsonschema:"Control owner user ID."`
+	OwnerID            string   `json:"owner_id,omitempty" jsonschema:"Control owner: user ID, email, name, or group ID. User identifiers resolve to the member's managed personal group (Openlane controlOwnerID)."`
+	DelegateID         string   `json:"delegate_id,omitempty" jsonschema:"Control delegate: user ID, email, name, or group ID. User identifiers resolve to the member's managed personal group (Openlane delegateID)."`
 	Tags               []string `json:"tags,omitempty" jsonschema:"Tags to apply."`
 }
 
@@ -30,7 +31,8 @@ type updateControlInput struct {
 	Category    string   `json:"category,omitempty" jsonschema:"Updated category."`
 	Subcategory string   `json:"subcategory,omitempty" jsonschema:"Updated subcategory."`
 	StandardID  string   `json:"standard_id,omitempty" jsonschema:"Updated standard ID."`
-	OwnerID     string   `json:"owner_id,omitempty" jsonschema:"Updated control owner user ID."`
+	OwnerID     string   `json:"owner_id,omitempty" jsonschema:"Updated control owner: user ID, email, name, or group ID. User identifiers resolve to the member's managed personal group (Openlane controlOwnerID)."`
+	DelegateID  string   `json:"delegate_id,omitempty" jsonschema:"Updated control delegate: user ID, email, name, or group ID. User identifiers resolve to the member's managed personal group (Openlane delegateID)."`
 	Tags        []string `json:"tags,omitempty" jsonschema:"Replace tags with this list."`
 }
 
@@ -45,7 +47,7 @@ func registerWriteControls(server *mcp.Server, h *handlers) {
 	addTool(server, &mcp.Tool{
 		Name:        "openlane_control_update",
 		Title:       "Update an Openlane control",
-		Description: "Update a control by ID. Requires write mode.",
+		Description: "Update a control by ID. Use owner_id and delegate_id to assign responsibility; pass a user id/email/name or a group id. User identifiers are resolved to managed personal groups before calling Openlane controlOwnerID/delegateID. Requires write mode.",
 		Annotations: writeAnnotations(),
 	}, h.updateControl)
 }
@@ -80,7 +82,18 @@ func (h *handlers) createControl(ctx context.Context, _ *mcp.CallToolRequest, in
 		input.StandardID = &in.StandardID
 	}
 	if in.OwnerID != "" {
-		input.ControlOwnerID = &in.OwnerID
+		ownerGroupID, err := h.resolveControlAssigneeGroupID(ctx, in.OwnerID)
+		if err != nil {
+			return nil, controlItem{}, err
+		}
+		input.ControlOwnerID = &ownerGroupID
+	}
+	if in.DelegateID != "" {
+		delegateGroupID, err := h.resolveControlAssigneeGroupID(ctx, in.DelegateID)
+		if err != nil {
+			return nil, controlItem{}, err
+		}
+		input.DelegateID = &delegateGroupID
 	}
 
 	resp, err := h.api.CreateControl(ctx, input)
@@ -114,7 +127,18 @@ func (h *handlers) updateControl(ctx context.Context, _ *mcp.CallToolRequest, in
 		input.StandardID = &in.StandardID
 	}
 	if in.OwnerID != "" {
-		input.ControlOwnerID = &in.OwnerID
+		ownerGroupID, err := h.resolveControlAssigneeGroupID(ctx, in.OwnerID)
+		if err != nil {
+			return nil, controlItem{}, err
+		}
+		input.ControlOwnerID = &ownerGroupID
+	}
+	if in.DelegateID != "" {
+		delegateGroupID, err := h.resolveControlAssigneeGroupID(ctx, in.DelegateID)
+		if err != nil {
+			return nil, controlItem{}, err
+		}
+		input.DelegateID = &delegateGroupID
 	}
 	if len(in.Tags) > 0 {
 		input.Tags = in.Tags
@@ -143,6 +167,8 @@ func mapCreatedControl(c graphclient.CreateControl_CreateControl_Control) contro
 		Subcategory:        openlane.Deref(c.Subcategory),
 		StandardID:         openlane.Deref(c.StandardID),
 		OwnerID:            openlane.Deref(c.OwnerID),
+		ControlOwnerID:     openlane.Deref(c.ControlOwnerID),
+		DelegateID:         openlane.Deref(c.DelegateID),
 		Tags:               c.Tags,
 	}
 }
@@ -160,6 +186,8 @@ func mapUpdatedControl(c graphclient.UpdateControl_UpdateControl_Control) contro
 		Subcategory:        openlane.Deref(c.Subcategory),
 		StandardID:         openlane.Deref(c.StandardID),
 		OwnerID:            openlane.Deref(c.OwnerID),
+		ControlOwnerID:     openlane.Deref(c.ControlOwnerID),
+		DelegateID:         openlane.Deref(c.DelegateID),
 		Tags:               c.Tags,
 	}
 }
@@ -172,5 +200,6 @@ func isEmptyUpdateControl(in graphclient.UpdateControlInput) bool {
 		in.Subcategory == nil &&
 		in.StandardID == nil &&
 		in.ControlOwnerID == nil &&
+		in.DelegateID == nil &&
 		len(in.Tags) == 0
 }

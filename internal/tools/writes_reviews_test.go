@@ -21,9 +21,9 @@ func TestCreateVendorRiskReviewRequiresTitleAndEntity(t *testing.T) {
 
 func TestCreateVendorRiskReviewSuccess(t *testing.T) {
 	h := &handlers{api: &fakeAPI{}, allowWrite: true}
-	body := "Assessment body with no NomuPay PII."
+	body := "Assessment body for vendor onboarding."
 	_, item, err := h.createVendorRiskReview(context.Background(), nil, createVendorRiskReviewInput{
-		Title:     "Saepio vendor risk assessment – no NomuPay PII",
+		Title:     "Example vendor risk assessment",
 		Body:      body,
 		EntityIDs: []string{"ent_saepio"},
 	})

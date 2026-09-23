@@ -104,7 +104,10 @@ func main() {
 		fmt.Printf("GetOrgMemberships total=%d edges=%d\n", allMembers.OrgMemberships.TotalCount, len(allMembers.OrgMemberships.Edges))
 	}
 
-	email := "greg.knell@nomupay.com"
+	email := os.Getenv("OPENLANE_PROBE_USER_EMAIL")
+	if email == "" {
+		email = "user@example.com"
+	}
 	members, err = raw.GetOrgMembersByOrgID(ctx, &graphclient.OrgMembershipWhereInput{
 		OrganizationID: &orgID,
 		HasUserWith:    []*graphclient.UserWhereInput{{EmailContainsFold: &email}},

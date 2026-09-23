@@ -43,11 +43,14 @@ func (f *fakeAPI) GetGroups(_ context.Context, _ *int64, _ *string, _ *graphclie
 	}
 	return nil, errors.New("unused")
 }
-func (f *fakeAPI) GetGroupByID(_ context.Context, _ string) (*graphclient.GetGroupByID, error) {
-	if f.group != nil {
-		return f.group, nil
+func (f *fakeAPI) GetGroupByID(_ context.Context, id string) (*graphclient.GetGroupByID, error) {
+	if f.group == nil {
+		return nil, errors.New("unused")
 	}
-	return nil, errors.New("unused")
+	if f.group.Group.ID == "" || f.group.Group.ID != id {
+		return nil, errors.New("group not found")
+	}
+	return f.group, nil
 }
 func (f *fakeAPI) GetUsers(_ context.Context, _ *int64, _ *string, _ *graphclient.UserWhereInput) (*graphclient.GetUsers, error) {
 	if f.err != nil {

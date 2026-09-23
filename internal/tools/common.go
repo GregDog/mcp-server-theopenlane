@@ -21,6 +21,16 @@ type searchInput struct {
 	Cursor string `json:"cursor,omitempty" jsonschema:"Opaque cursor from a previous search response."`
 }
 
+type controlListInput struct {
+	listInput
+	LinkableOnly bool `json:"linkable_only,omitempty" jsonschema:"When true, return only org-owned controls that can be linked to evidence (excludes system catalog copies)."`
+}
+
+type controlSearchInput struct {
+	searchInput
+	LinkableOnly bool `json:"linkable_only,omitempty" jsonschema:"When true, return only org-owned controls that can be linked to evidence (excludes system catalog copies)."`
+}
+
 type programListInput struct {
 	listInput
 	Name string `json:"name,omitempty" jsonschema:"Filter programs whose name contains this text (case-insensitive)."`

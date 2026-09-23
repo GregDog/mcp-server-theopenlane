@@ -90,7 +90,7 @@ After `make build` and configuring `.env` (enable write mode for lifecycle/assig
 5. **Metadata** — `openlane_workflow_metadata_get` with `{"schema_type":"InternalPolicy"}` before authoring workflows.
 6. **Native lifecycle** (write mode, `confirm: true`) — `openlane_policy_submit_for_approval`, `openlane_policy_approve`, `openlane_policy_return_to_draft`, `openlane_policy_publish` on a test policy.
 7. **Workflow assignment** (write mode, `confirm: true`) — only when a real assignment exists: `openlane_workflow_assignment_approve` or `openlane_workflow_assignment_reject` with `reason`.
-8. **Group/user lookup** — `openlane_groups_list` / `openlane_users_list` with name filters before `openlane_workflow_assignment_reassign`.
+8. **Group/user lookup** — `openlane_groups_list` / `openlane_users_list` with name filters before `openlane_workflow_assignment_reassign` or `openlane_control_update` `owner_id` / `delegate_id` (user ids resolve to managed personal groups).
 
 In Cursor, reload MCP after rebuilding (`make build`, then **Developer: Reload Window** or restart the `openlane` server under **Settings → MCP**). Use **Output → MCP Logs** if a tool fails. Compare results with the Openlane UI for the same object IDs.
 
@@ -153,6 +153,12 @@ Evidence uploads (`files[]` array):
 Local test artifacts can live under `.local/` (gitignored). Do not commit test files or API tokens.
 
 MCP read tools return `file_ids` but not presigned download URLs. Verify downloads in the Openlane UI or with a direct API client.
+
+### Linking evidence to controls
+
+`openlane_evidence_create` accepts optional `control_ids` (org-owned controls only). `openlane_controls_search` with `linkable_only: true` filters to controls with `owner_id` set. System catalog copies are rejected ([core#1647](https://github.com/theopenlane/core/pull/1647)). Probes in this repo: `scripts/test-org-control-link`, `scripts/test-program-controls`, `scripts/test-linkable-controls`.
+
+When testing CSV or other large file uploads through an agent, use a direct MCP client or script for the create call — relaying `content_base64` through multi-step agent tool chains often corrupts the payload.
 
 ## Tool inventory
 

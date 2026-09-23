@@ -13,14 +13,53 @@ import (
 func (f *fakeAPI) CreateControl(context.Context, graphclient.CreateControlInput) (*graphclient.CreateControl, error) {
 	return nil, errors.New("unused")
 }
-func (f *fakeAPI) UpdateControl(context.Context, string, graphclient.UpdateControlInput) (*graphclient.UpdateControl, error) {
-	return nil, errors.New("unused")
+func (f *fakeAPI) UpdateControl(_ context.Context, id string, input graphclient.UpdateControlInput) (*graphclient.UpdateControl, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	f.lastUpdateControlInput = input
+	return &graphclient.UpdateControl{
+		UpdateControl: graphclient.UpdateControl_UpdateControl{
+			Control: graphclient.UpdateControl_UpdateControl_Control{
+				ID:             id,
+				RefCode:        "AC-1",
+				ControlOwnerID: input.ControlOwnerID,
+				DelegateID:     input.DelegateID,
+			},
+		},
+	}, nil
 }
-func (f *fakeAPI) CreateEvidence(context.Context, graphclient.CreateEvidenceInput, []*graphql.Upload) (*graphclient.CreateEvidence, error) {
-	return nil, errors.New("unused")
+func (f *fakeAPI) CreateEvidence(_ context.Context, input graphclient.CreateEvidenceInput, _ []*graphql.Upload) (*graphclient.CreateEvidence, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	f.lastCreateEvidenceInput = input
+	return &graphclient.CreateEvidence{
+		CreateEvidence: graphclient.CreateEvidence_CreateEvidence{
+			Evidence: graphclient.CreateEvidence_CreateEvidence_Evidence{
+				ID:   "evidence_1",
+				Name: input.Name,
+			},
+		},
+	}, nil
 }
-func (f *fakeAPI) UpdateEvidence(context.Context, string, graphclient.UpdateEvidenceInput, []*graphql.Upload) (*graphclient.UpdateEvidence, error) {
-	return nil, errors.New("unused")
+func (f *fakeAPI) UpdateEvidence(_ context.Context, id string, input graphclient.UpdateEvidenceInput, _ []*graphql.Upload) (*graphclient.UpdateEvidence, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	f.lastUpdateEvidenceInput = input
+	name := "updated"
+	if input.Name != nil {
+		name = *input.Name
+	}
+	return &graphclient.UpdateEvidence{
+		UpdateEvidence: graphclient.UpdateEvidence_UpdateEvidence{
+			Evidence: graphclient.UpdateEvidence_UpdateEvidence_Evidence{
+				ID:   id,
+				Name: name,
+			},
+		},
+	}, nil
 }
 func (f *fakeAPI) CreateInternalPolicy(context.Context, graphclient.CreateInternalPolicyInput) (*graphclient.CreateInternalPolicy, error) {
 	return nil, errors.New("unused")

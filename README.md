@@ -197,7 +197,8 @@ Write tools (require `OPENLANE_ALLOW_WRITE=true` or `--allow-write`):
 | Tool | Description |
 | --- | --- |
 | `openlane_control_create` / `openlane_control_update` | Create or update a control |
-| `openlane_evidence_create` / `openlane_evidence_update` | Create or update evidence; optional base64 file uploads |
+| `openlane_evidence_create` / `openlane_evidence_update` | Create or update evidence; optional `control_ids` / `add_control_ids` / `remove_control_ids` (org-owned controls only — not system catalog copies); optional base64 file uploads |
+| `openlane_controls_list` / `openlane_controls_search` | Optional `linkable_only` returns org-owned controls suitable for evidence linking |
 | `openlane_policy_create` / `openlane_policy_update` | Create or update an internal policy |
 | `openlane_policy_submit_for_approval` / `openlane_policy_approve` / `openlane_policy_publish` / `openlane_policy_return_to_draft` | Native InternalPolicy status transitions (`confirm` required) |
 | `openlane_risk_create` / `openlane_risk_update` | Create or update a risk |
@@ -229,6 +230,14 @@ List responses are paginated (`items`, `next_cursor`, `has_more`, `total_count`)
 There is no dedicated control search GraphQL operation in the current Openlane Go client. `openlane_controls_search` uses official `ControlWhereInput` contains-filters.
 
 File contents and presigned download URLs are not returned from read tools. Write tools accept optional base64-encoded `files[]` on evidence create/update (default max 10 MiB decoded per file).
+
+### Linking evidence to controls
+
+`openlane_evidence_create` accepts optional `control_ids`; `openlane_evidence_update` supports `add_control_ids` / `remove_control_ids`. Only **org-owned** controls (`owner_id` set) may be linked — system catalog copies are rejected ([core#1647](https://github.com/theopenlane/core/pull/1647)). Use `openlane_controls_search` with `linkable_only: true` to list linkable controls. Program-imported controls may still show `source: FRAMEWORK` when `owner_id` is set.
+
+`openlane_control_update` accepts `owner_id` and `delegate_id` as user id, email, name, or group id; user identifiers resolve to managed personal groups (Openlane `controlOwnerID` / `delegateID`).
+
+For large `files[]` base64 uploads, prefer a direct MCP client or automation script that passes the payload machine-to-machine. Agent loops that copy `content_base64` between tool calls may truncate or corrupt the data.
 
 ## HTTP transport
 

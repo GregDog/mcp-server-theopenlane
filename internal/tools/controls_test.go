@@ -28,12 +28,18 @@ type fakeAPI struct {
 	assignment *openlane.WorkflowAssignmentDetail
 	deletedID  string
 	entity     *openlane.EntityDetail
+
+	lastCreateEvidenceInput graphclient.CreateEvidenceInput
+	lastUpdateEvidenceInput graphclient.UpdateEvidenceInput
+	lastUpdateControlInput  graphclient.UpdateControlInput
+	lastControlWhere        *graphclient.ControlWhereInput
 }
 
 func (f *fakeAPI) GetControls(ctx context.Context, first *int64, after *string, where *graphclient.ControlWhereInput) (*graphclient.GetControls, error) {
 	if f.err != nil {
 		return nil, f.err
 	}
+	f.lastControlWhere = where
 	return f.controls, nil
 }
 
@@ -110,7 +116,7 @@ func TestListControls(t *testing.T) {
 		},
 	}
 	h := &handlers{api: api}
-	_, page, err := h.listControls(context.Background(), nil, listInput{Limit: 10})
+	_, page, err := h.listControls(context.Background(), nil, controlListInput{Limit: 10})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -153,8 +159,23 @@ func TestGetControl(t *testing.T) {
 
 func TestSearchControlsRequiresQuery(t *testing.T) {
 	h := &handlers{api: &fakeAPI{}}
-	_, _, err := h.searchControls(context.Background(), nil, searchInput{})
+	_, _, err := h.searchControls(context.Background(), nil, controlSearchInput{})
 	if err == nil {
 		t.Fatal("expected error")
+	}
+}
+
+func TestSearchControlsLinkableOnly(t *testing.T) {
+	api := &fakeAPI{controls: &graphclient.GetControls{Controls: graphclient.GetControls_Controls{}}}
+	h := &handlers{api: api}
+	_, _, err := h.searchControls(context.Background(), nil, controlSearchInput{
+		Query:        "awareness",
+		LinkableOnly: true,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if api.lastControlWhere == nil || api.lastControlWhere.OwnerIDNotNil == nil || !*api.lastControlWhere.OwnerIDNotNil {
+		t.Fatalf("expected OwnerIDNotNil filter: %+v", api.lastControlWhere)
 	}
 }

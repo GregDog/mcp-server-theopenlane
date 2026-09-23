@@ -4,6 +4,18 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- `control_ids` on `openlane_evidence_create`; `add_control_ids` / `remove_control_ids` on `openlane_evidence_update` (org-owned controls only)
+- `linkable_only` on `openlane_controls_list` / `openlane_controls_search` (`OwnerIDNotNil: true`)
+- `source`, `owner_id`, `linkable_to_evidence` on control list/search/get responses
+- `delegate_id` on `openlane_control_create` / `openlane_control_update`; `delegate_id` on control get responses
+- `owner_id` / `delegate_id` on control writes accept user id, email, name, or group id and resolve users to managed personal groups before calling Openlane `controlOwnerID` / `delegateID`
+
+### Fixed
+
+- Evidence control linking validation rejects system catalog controls (no `owner_id`) per [core#1647](https://github.com/theopenlane/core/pull/1647); program-imported controls with `source: FRAMEWORK` but `owner_id` set remain linkable
+
 ## [0.6.0] - 2026-09-22
 
 ### Added

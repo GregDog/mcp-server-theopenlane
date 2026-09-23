@@ -8,7 +8,7 @@ import (
 )
 
 func TestListUsersReturnsOrgMembers(t *testing.T) {
-	email := "greg.knell@nomupay.com"
+	email := "alice@example.com"
 	h := &handlers{
 		organizationID: "01ORG",
 		api: &fakeAPI{
@@ -19,7 +19,7 @@ func TestListUsersReturnsOrgMembers(t *testing.T) {
 							User: graphclient.GetOrgMembersByOrgID_OrgMemberships_Edges_Node_User{
 								ID:          "01USER",
 								Email:       email,
-								DisplayName: "Greg",
+								DisplayName: "Alice",
 							},
 						}},
 					},

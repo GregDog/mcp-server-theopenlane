@@ -55,6 +55,16 @@ Each get tool fetches at most eight related items per relationship (plus `total_
 | `openlane_controls_search` | `GetControls` with `ControlWhereInput` |
 | `openlane_control_get` | `GetControlByID` + bounded relation lists |
 
+List/search responses include `source`, `owner_id`, `control_owner_id`, `delegate_id`, and `linkable_to_evidence`. `owner_id` is the org that owns the control (set on program-imported copies); `control_owner_id` and `delegate_id` are responsibility assignments (Openlane group ids). Openlane rejects linking system-owned catalog controls to evidence ([core#1647](https://github.com/theopenlane/core/pull/1647)). Program-imported controls may still have `source: FRAMEWORK` but are linkable when `owner_id` is set.
+
+`openlane_control_create` / `openlane_control_update` accept `owner_id` and `delegate_id` as user id, email, name, or group id. User identifiers are resolved to the member's managed personal group before calling Openlane `controlOwnerID` / `delegateID` (passing raw user ids returns `UNAUTHORIZED`). Use `openlane_users_list` + `openlane_groups_list` when resolution is ambiguous.
+
+`openlane_controls_list` / `openlane_controls_search` filters:
+
+| Field | Maps to |
+| --- | --- |
+| `linkable_only` | `OwnerIDNotNil: true` |
+
 `openlane_control_get` includes assessment methods/objectives and summaries of programs, evidence, findings, risks, and implementations.
 
 ## Programs
@@ -406,8 +416,8 @@ Enabled with `OPENLANE_ALLOW_WRITE=true` or `openlane-mcp serve --allow-write`.
 | --- | --- |
 | `openlane_control_create` | `CreateControl` |
 | `openlane_control_update` | `UpdateControl` |
-| `openlane_evidence_create` | `CreateEvidence` (optional `files[]` base64 uploads) |
-| `openlane_evidence_update` | `UpdateEvidence` (optional `files[]` base64 uploads) |
+| `openlane_evidence_create` | `CreateEvidence` (optional `control_ids`, `files[]` base64 uploads) |
+| `openlane_evidence_update` | `UpdateEvidence` (`add_control_ids`, `remove_control_ids`, optional `files[]` base64 uploads) |
 | `openlane_policy_create` | `CreateInternalPolicy` |
 | `openlane_policy_update` | `UpdateInternalPolicy` |
 | `openlane_policy_submit_for_approval` | `UpdateInternalPolicy` status `NEEDS_APPROVAL` (`confirm` required) |

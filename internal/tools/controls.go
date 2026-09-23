@@ -15,6 +15,8 @@ type controlItem struct {
 	RefCode                string                         `json:"ref_code,omitempty"`
 	Title                  string                         `json:"title,omitempty"`
 	Status                 string                         `json:"status,omitempty"`
+	Source                 string                         `json:"source,omitempty"`
+	LinkableToEvidence     bool                           `json:"linkable_to_evidence"`
 	ReferenceFramework     string                         `json:"reference_framework,omitempty"`
 	Category               string                         `json:"category,omitempty"`
 	Description            string                         `json:"description,omitempty"`
@@ -22,6 +24,7 @@ type controlItem struct {
 	StandardID             string                         `json:"standard_id,omitempty"`
 	OwnerID                string                         `json:"owner_id,omitempty"`
 	ControlOwnerID         string                         `json:"control_owner_id,omitempty"`
+	DelegateID             string                         `json:"delegate_id,omitempty"`
 	ControlKindName        string                         `json:"control_kind_name,omitempty"`
 	ImplementationGuidance any                            `json:"implementation_guidance,omitempty"`
 	AssessmentMethods      any                            `json:"assessment_methods,omitempty"`
@@ -38,14 +41,14 @@ func registerControls(server *mcp.Server, h *handlers) {
 	addTool(server, &mcp.Tool{
 		Name:        "openlane_controls_list",
 		Title:       "List Openlane controls",
-		Description: "List controls in the configured Openlane organization. Results are paginated.",
+		Description: "List controls in the configured Openlane organization. Use linkable_only to return org-owned controls suitable for evidence linking (excludes system catalog copies). Results are paginated.",
 		Annotations: readOnly(),
 	}, h.listControls)
 
 	addTool(server, &mcp.Tool{
 		Name:        "openlane_controls_search",
 		Title:       "Search Openlane controls",
-		Description: "Search controls by ref code, title, or description using Openlane where-filters. Results are paginated.",
+		Description: "Search controls by ref code, title, or description. Use linkable_only when resolving controls for evidence linking (org-owned program controls only). Results are paginated.",
 		Annotations: readOnly(),
 	}, h.searchControls)
 
@@ -57,27 +60,28 @@ func registerControls(server *mcp.Server, h *handlers) {
 	}, h.getControl)
 }
 
-func (h *handlers) listControls(ctx context.Context, _ *mcp.CallToolRequest, in listInput) (*mcp.CallToolResult, openlane.Page[controlItem], error) {
+func (h *handlers) listControls(ctx context.Context, _ *mcp.CallToolRequest, in controlListInput) (*mcp.CallToolResult, openlane.Page[controlItem], error) {
 	first, after := pageArgs(in.Limit, in.Cursor)
-	resp, err := h.api.GetControls(ctx, &first, after, nil)
+	where := controlWhereLinkableOnly(in.LinkableOnly)
+	resp, err := h.api.GetControls(ctx, &first, after, where)
 	if err != nil {
 		return nil, openlane.Page[controlItem]{}, openlane.APIError(err)
 	}
 	return nil, mapControlPage(resp.Controls.Edges, resp.Controls.PageInfo.HasNextPage, resp.Controls.PageInfo.EndCursor, resp.Controls.TotalCount), nil
 }
 
-func (h *handlers) searchControls(ctx context.Context, _ *mcp.CallToolRequest, in searchInput) (*mcp.CallToolResult, openlane.Page[controlItem], error) {
+func (h *handlers) searchControls(ctx context.Context, _ *mcp.CallToolRequest, in controlSearchInput) (*mcp.CallToolResult, openlane.Page[controlItem], error) {
 	if in.Query == "" {
 		return nil, openlane.Page[controlItem]{}, errQueryRequired
 	}
 	q := in.Query
-	where := &graphclient.ControlWhereInput{
+	where := mergeControlWhere(&graphclient.ControlWhereInput{
 		Or: []*graphclient.ControlWhereInput{
 			{RefCodeContainsFold: &q},
 			{TitleContainsFold: &q},
 			{DescriptionContainsFold: &q},
 		},
-	}
+	}, controlWhereLinkableOnly(in.LinkableOnly))
 	first, after := pageArgs(in.Limit, in.Cursor)
 	resp, err := h.api.GetControls(ctx, &first, after, where)
 	if err != nil {
@@ -95,25 +99,7 @@ func (h *handlers) getControl(ctx context.Context, _ *mcp.CallToolRequest, in ge
 		return nil, controlItem{}, openlane.APIError(err)
 	}
 	c := resp.Control
-	item := controlItem{
-		ID:                     c.ID,
-		DisplayID:              c.DisplayID,
-		RefCode:                c.RefCode,
-		Title:                  openlane.Deref(c.Title),
-		Status:                 openlane.Format(c.Status),
-		ReferenceFramework:     openlane.Deref(c.ReferenceFramework),
-		Category:               openlane.Deref(c.Category),
-		Description:            openlane.Deref(c.Description),
-		Subcategory:            openlane.Deref(c.Subcategory),
-		StandardID:             openlane.Deref(c.StandardID),
-		OwnerID:                openlane.Deref(c.OwnerID),
-		ControlOwnerID:         openlane.Deref(c.ControlOwnerID),
-		ControlKindName:        openlane.Deref(c.ControlKindName),
-		ImplementationGuidance: c.ImplementationGuidance,
-		AssessmentMethods:      c.AssessmentMethods,
-		AssessmentObjectives:   c.AssessmentObjectives,
-		Tags:                   c.Tags,
-	}
+	item := mapControlDetail(c)
 	controlWhere := []*graphclient.ControlWhereInput{{ID: &in.ID}}
 	runRelJobs(
 		func() {
@@ -139,16 +125,7 @@ func mapControlPage(edges []*graphclient.GetControls_Controls_Edges, hasMore boo
 		if e == nil || e.Node == nil {
 			continue
 		}
-		n := e.Node
-		items = append(items, controlItem{
-			ID:                 n.ID,
-			DisplayID:          n.DisplayID,
-			RefCode:            n.RefCode,
-			Title:              openlane.Deref(n.Title),
-			Status:             openlane.Format(n.Status),
-			ReferenceFramework: openlane.Deref(n.ReferenceFramework),
-			Category:           openlane.Deref(n.Category),
-		})
+		items = append(items, mapControlListNode(e.Node))
 	}
 	return openlane.Page[controlItem]{
 		Items:      items,

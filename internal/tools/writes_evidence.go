@@ -23,6 +23,7 @@ type createEvidenceInput struct {
 	CollectionProcedure string              `json:"collection_procedure,omitempty" jsonschema:"How the evidence was collected."`
 	URL                 string              `json:"url,omitempty" jsonschema:"External evidence URL when not uploaded as a file."`
 	Tags                []string            `json:"tags,omitempty" jsonschema:"Tags to apply."`
+	ControlIDs          []string            `json:"control_ids,omitempty" jsonschema:"Control IDs to link to this evidence on create."`
 	Files               []evidenceFileInput `json:"files,omitempty" jsonschema:"Optional files to upload with the evidence record."`
 }
 
@@ -34,6 +35,8 @@ type updateEvidenceInput struct {
 	CollectionProcedure string              `json:"collection_procedure,omitempty" jsonschema:"Updated collection procedure."`
 	URL                 string              `json:"url,omitempty" jsonschema:"Updated external evidence URL."`
 	Tags                []string            `json:"tags,omitempty" jsonschema:"Replace tags with this list."`
+	AddControlIDs       []string            `json:"add_control_ids,omitempty" jsonschema:"Control IDs to link to this evidence."`
+	RemoveControlIDs    []string            `json:"remove_control_ids,omitempty" jsonschema:"Control IDs to unlink from this evidence without deleting the evidence record."`
 	Files               []evidenceFileInput `json:"files,omitempty" jsonschema:"Optional files to attach to the evidence record."`
 }
 
@@ -41,14 +44,14 @@ func registerWriteEvidence(server *mcp.Server, h *handlers) {
 	addTool(server, &mcp.Tool{
 		Name:        "openlane_evidence_create",
 		Title:       "Create Openlane evidence",
-		Description: "Create evidence in Openlane. Optional files are uploaded as base64 payloads. Requires write mode.",
+		Description: "Create evidence in Openlane. Optional control_ids links the evidence to org-owned controls (not system catalog copies). Optional files are uploaded as base64 payloads. Requires write mode.",
 		Annotations: writeAnnotations(),
 	}, h.createEvidence)
 
 	addTool(server, &mcp.Tool{
 		Name:        "openlane_evidence_update",
 		Title:       "Update Openlane evidence",
-		Description: "Update evidence by ID. Optional files are uploaded as base64 payloads. Requires write mode.",
+		Description: "Update evidence by ID. Use add_control_ids to link org-owned controls (not system catalog copies) or remove_control_ids to unlink without deleting the evidence. Optional files are uploaded as base64 payloads. Requires write mode.",
 		Annotations: writeAnnotations(),
 	}, h.updateEvidence)
 }
@@ -72,6 +75,12 @@ func (h *handlers) createEvidence(ctx context.Context, _ *mcp.CallToolRequest, i
 	}
 	if in.URL != "" {
 		input.URL = &in.URL
+	}
+	if len(in.ControlIDs) > 0 {
+		if err := h.validateEvidenceControlIDs(ctx, in.ControlIDs); err != nil {
+			return nil, evidenceItem{}, err
+		}
+		input.ControlIDs = in.ControlIDs
 	}
 
 	uploads, err := h.decodeEvidenceFiles(in.Files)
@@ -108,6 +117,15 @@ func (h *handlers) updateEvidence(ctx context.Context, _ *mcp.CallToolRequest, i
 	}
 	if len(in.Tags) > 0 {
 		input.Tags = in.Tags
+	}
+	if len(in.AddControlIDs) > 0 {
+		if err := h.validateEvidenceControlIDs(ctx, in.AddControlIDs); err != nil {
+			return nil, evidenceItem{}, err
+		}
+		input.AddControlIDs = in.AddControlIDs
+	}
+	if len(in.RemoveControlIDs) > 0 {
+		input.RemoveControlIDs = in.RemoveControlIDs
 	}
 
 	uploads, err := h.decodeEvidenceFiles(in.Files)
@@ -208,5 +226,7 @@ func isEmptyUpdateEvidence(in graphclient.UpdateEvidenceInput) bool {
 		in.Source == nil &&
 		in.CollectionProcedure == nil &&
 		in.URL == nil &&
-		len(in.Tags) == 0
+		len(in.Tags) == 0 &&
+		len(in.AddControlIDs) == 0 &&
+		len(in.RemoveControlIDs) == 0
 }
