@@ -300,7 +300,9 @@ type updatePlatformWithDiagramsResponse struct {
 }
 
 func (a *api) GetPlatforms(ctx context.Context, first *int64, after *string, where *graphclient.PlatformWhereInput) (*graphclient.GetPlatforms, error) {
-	return a.c.GetPlatforms(ctx, first, nil, after, nil, nil, where, nil)
+	// GetPlatforms puts orderBy before where (unlike most list queries). Do not pass a
+	// trailing nil — it becomes a nil variadic interceptor and panics the gqlgenc chain.
+	return a.c.GetPlatforms(ctx, first, nil, after, nil, nil, where)
 }
 
 func (a *api) GetPlatformByID(ctx context.Context, id string) (*graphclient.GetPlatformByID, error) {

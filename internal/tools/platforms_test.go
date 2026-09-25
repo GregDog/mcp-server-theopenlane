@@ -51,10 +51,10 @@ func TestGetPlatformRequiresID(t *testing.T) {
 func TestGetPlatform(t *testing.T) {
 	api := &fakeAPI{
 		platformDetail: &openlane.PlatformDetail{
-			ID:          "plt_1",
-			DisplayID:   "PLT-001",
-			Name:        "Production API",
-			Status:      enums.PlatformStatusActive,
+			ID:            "plt_1",
+			DisplayID:     "PLT-001",
+			Name:          "Production API",
+			Status:        enums.PlatformStatusActive,
 			BusinessOwner: openlane.PlatformOwnerRole{Kind: "name", Name: "Platform Team"},
 		},
 	}

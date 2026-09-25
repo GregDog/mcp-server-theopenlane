@@ -60,8 +60,8 @@ func TestCreatePlatformOwnerResolvesUserID(t *testing.T) {
 	}
 	h := &handlers{api: api, organizationID: "org_1"}
 	_, _, err := h.createPlatform(context.Background(), nil, createPlatformInput{
-		Name:            "Production API",
-		TechnicalOwner:  "owner@example.com",
+		Name:           "Production API",
+		TechnicalOwner: "owner@example.com",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -91,8 +91,8 @@ func TestCreatePlatformOwnerResolvesGroupID(t *testing.T) {
 	}
 	h := &handlers{api: api, organizationID: "org_1"}
 	_, _, err := h.createPlatform(context.Background(), nil, createPlatformInput{
-		Name:            "Production API",
-		TechnicalOwner:  "Platform Ops",
+		Name:           "Production API",
+		TechnicalOwner: "Platform Ops",
 	})
 	if err != nil {
 		t.Fatal(err)
