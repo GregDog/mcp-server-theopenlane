@@ -4,12 +4,18 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-09-25
+
 ### Added
 
 - Read tools for platforms (system boundaries): `openlane_platforms_list`, `openlane_platform_get`
 - Write tools: `openlane_platform_create`, `openlane_platform_update` (narrative fields, four owner roles, scope links, optional diagram uploads)
 - Platform owner resolution writes user id or group id to the correct Openlane column (not the control personal-group pattern); enriched owner objects on list/get
 - [docs/openlane-assignee-ids.md](docs/openlane-assignee-ids.md) — platform owner ID rules
+
+### Fixed
+
+- `openlane_platforms_list` no longer panics the MCP server (trailing `nil` was passed as a variadic GraphQL interceptor on `GetPlatforms`)
 
 ## [0.7.1] - 2026-09-23
 
