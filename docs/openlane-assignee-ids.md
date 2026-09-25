@@ -23,9 +23,27 @@ Passing a **user ID** to Openlane `controlOwnerID` / `delegateID` returns `UNAUT
 | **Controls** (`openlane_control_create` / `openlane_control_update`) | Yes — `owner_id` / `delegate_id` | Yes — `control_owner` and `delegate` on list/search/get/update |
 | **Risks** (`openlane_risk_create` / `openlane_risk_update`) | Yes — `stakeholder_id` / `delegate_id` | Yes — `stakeholder` and `delegate` on list/get/create/update |
 | **Policies** (`openlane_policy_create` / `openlane_policy_update`) | Yes — `approver_id` / `delegate_id` | Yes — `approver` and `delegate` on list/get/create/update; lifecycle preview too |
+| **Platforms** (`openlane_platform_create` / `openlane_platform_update`) | Email/name/id → `*OwnerUserID` or group → `*OwnerGroupID`; `*_owner_name` for free text | Yes — `business_owner`, `technical_owner`, `security_owner`, `internal_owner` objects on list/get |
 | **Workflows** | USER vs GROUP targets resolved separately | N/A |
 
-Helpers live in `internal/tools/control_assignees.go` (`resolveGroupAssigneeGroupID`, `resolveGroupAssigneeSummary`). Reuse them for any new assignee fields — do not duplicate the pattern.
+Helpers live in `internal/tools/control_assignees.go` (`resolveGroupAssigneeGroupID`, `resolveGroupAssigneeSummary`) and `internal/tools/platform_assignees.go` (`resolvePlatformOwner`). Reuse them for any new assignee fields — do not duplicate the pattern.
+
+## Platform owner roles
+
+Platform ownership is **not** the control `controlOwnerID` pattern. Each role (`business_owner`, `technical_owner`, `security_owner`, `internal_owner`) maps to separate user id, group id, or free-text name columns on the platform record.
+
+- Pass a user email, display name, or user id → MCP sets `businessOwnerUserID` (and the matching technical/security/internal fields).
+- Pass a group id or group name → MCP sets `businessOwnerGroupID` (and the matching group fields).
+- Pass `business_owner_name` (and the matching `*_owner_name` fields) when no account is linked.
+- Do **not** call `openlane_user_get` on `*_owner_group_id` values. Confirm assignment from the enriched `*_owner` objects on `openlane_platform_get`.
+
+```json
+{
+  "name": "Production API",
+  "technical_owner": "owner@example.com",
+  "business_owner_name": "Product Leadership"
+}
+```
 
 ## Control writes (agents)
 

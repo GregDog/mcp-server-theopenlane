@@ -295,3 +295,21 @@ func (f *fakeAPI) UpdateEntity(_ context.Context, id string, _ graphclient.Updat
 	}
 	return &openlane.EntityDetail{ID: id, Name: strPtr("updated")}, nil
 }
+func (f *fakeAPI) CreatePlatform(_ context.Context, input graphclient.CreatePlatformInput, _ openlane.PlatformDiagramUploads) (*openlane.PlatformDetail, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	f.lastCreatePlatformInput = input
+	return &openlane.PlatformDetail{ID: "plt_1", Name: input.Name, DisplayID: "PLT-001"}, nil
+}
+func (f *fakeAPI) UpdatePlatform(_ context.Context, id string, input graphclient.UpdatePlatformInput, _ openlane.PlatformDiagramUploads) (*openlane.PlatformDetail, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	f.lastUpdatePlatformInput = input
+	name := "updated"
+	if input.Name != nil {
+		name = *input.Name
+	}
+	return &openlane.PlatformDetail{ID: id, Name: name, DisplayID: "PLT-001"}, nil
+}

@@ -33,6 +33,28 @@ func (f *fakeAPI) GetAssets(context.Context, *int64, *string, *graphclient.Asset
 func (f *fakeAPI) GetAssetByID(context.Context, string) (*graphclient.GetAssetByID, error) {
 	return nil, errors.New("unused")
 }
+func (f *fakeAPI) GetPlatforms(_ context.Context, _ *int64, _ *string, where *graphclient.PlatformWhereInput) (*graphclient.GetPlatforms, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	f.lastPlatformWhere = where
+	if f.platforms != nil {
+		return f.platforms, nil
+	}
+	return nil, errors.New("unused")
+}
+func (f *fakeAPI) GetPlatformByID(context.Context, string) (*graphclient.GetPlatformByID, error) {
+	return nil, errors.New("unused")
+}
+func (f *fakeAPI) GetPlatformDetail(_ context.Context, id string) (*openlane.PlatformDetail, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	if f.platformDetail != nil {
+		return f.platformDetail, nil
+	}
+	return &openlane.PlatformDetail{ID: id, Name: "Production API", DisplayID: "PLT-001"}, nil
+}
 func (f *fakeAPI) GetContacts(context.Context, *int64, *string, *graphclient.ContactWhereInput) (*graphclient.GetContacts, error) {
 	return nil, errors.New("unused")
 }

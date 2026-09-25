@@ -2,7 +2,7 @@
 
 Read tools are always registered. Write and delete tools are registered only when their mode is enabled.
 
-With all modes enabled there are **73 tools** (42 read, 25 write, 6 delete).
+With all modes enabled there are **77 tools** (44 read, 27 write, 6 delete).
 
 Arguments are validated by the MCP Go SDK from Go structs.
 
@@ -269,6 +269,30 @@ Entities represent vendors and other third parties in Openlane. There is no sepa
 | `openlane_assets_list` | `GetAssets` |
 | `openlane_asset_get` | `GetAssetByID` |
 
+## Platforms
+
+| Tool | Openlane client |
+| --- | --- |
+| `openlane_platforms_list` | `GetPlatforms` |
+| `openlane_platform_get` | Custom GraphQL `PlatformDetail` |
+| `openlane_platform_create` | Custom GraphQL `createPlatform` (optional diagram uploads) |
+| `openlane_platform_update` | Custom GraphQL `updatePlatform` (optional diagram uploads) |
+
+Platforms represent system boundaries (audit scope). Owner roles use separate user id and group id columns — not the control personal-group pattern. See [openlane-assignee-ids.md](openlane-assignee-ids.md).
+
+`openlane_platforms_list` filters:
+
+| Field | Maps to |
+| --- | --- |
+| `name` | `NameContainsFold` |
+| `display_id` | `DisplayIDEqualFold` |
+| `status` | `Status` (`ACTIVE`, `INACTIVE`, `RETIRED`) |
+| `environment` | `EnvironmentNameEqualFold` |
+| `region` | `RegionContainsFold` |
+| `criticality` | `CriticalityNameEqualFold` |
+
+`openlane_platform_get` returns narrative fields, four enriched owner objects, bounded scope link summaries (assets, vendors, controls, evidence, frameworks, risks, tasks, in/out-of-scope links), and diagram metadata (id + filename only).
+
 ## Contacts
 
 | Tool | Openlane client |
@@ -464,6 +488,8 @@ Enabled with `OPENLANE_ALLOW_WRITE=true` or `openlane-mcp serve --allow-write`.
 | `openlane_task_update` | `UpdateTask` |
 | `openlane_entity_create` | Custom GraphQL `createEntity` (optional `logo` base64 upload or `logo_remote_url`) |
 | `openlane_entity_update` | Custom GraphQL `updateEntity` (optional `logo` base64 upload or `logo_remote_url`) |
+| `openlane_platform_create` | Custom GraphQL `createPlatform` (optional architecture/data-flow/trust-boundary diagram uploads) |
+| `openlane_platform_update` | Custom GraphQL `updatePlatform` (scope link add/remove lists; optional diagram uploads) |
 | `openlane_workflow_create` | `CreateWorkflowDefinition` (`confirm` required; validated against `workflowMetadata` + copied JSON schema) |
 | `openlane_workflow_update` | `UpdateWorkflowDefinition` Get-then-patch (`confirm` required) |
 | `openlane_workflow_assignment_approve` | `ApproveWorkflowAssignment` (`confirm` required) |

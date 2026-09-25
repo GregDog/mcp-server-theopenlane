@@ -95,6 +95,16 @@ type mappedControlListInput struct {
 	Source      string `json:"source,omitempty" jsonschema:"Filter by mapping source: MANUAL, SUGGESTED, or IMPORTED."`
 }
 
+type platformListInput struct {
+	listInput
+	Name        string `json:"name,omitempty" jsonschema:"Filter platforms whose name contains this text (case-insensitive)."`
+	DisplayID   string `json:"display_id,omitempty" jsonschema:"Filter by display id (for example PLT-…)."`
+	Status      string `json:"status,omitempty" jsonschema:"Filter by lifecycle status: ACTIVE, INACTIVE, or RETIRED."`
+	Environment string `json:"environment,omitempty" jsonschema:"Filter by environment custom enum name."`
+	Region      string `json:"region,omitempty" jsonschema:"Filter by region (case-insensitive contains)."`
+	Criticality string `json:"criticality,omitempty" jsonschema:"Filter by criticality custom enum name."`
+}
+
 func readOnly() *mcp.ToolAnnotations {
 	destructive := false
 	openWorld := true

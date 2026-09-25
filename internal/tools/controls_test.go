@@ -30,6 +30,12 @@ type fakeAPI struct {
 	deletedID  string
 	entity     *openlane.EntityDetail
 
+	platforms              *graphclient.GetPlatforms
+	platformDetail         *openlane.PlatformDetail
+	lastCreatePlatformInput graphclient.CreatePlatformInput
+	lastUpdatePlatformInput graphclient.UpdatePlatformInput
+	lastPlatformWhere      *graphclient.PlatformWhereInput
+
 	lastCreateEvidenceInput graphclient.CreateEvidenceInput
 	lastUpdateEvidenceInput graphclient.UpdateEvidenceInput
 	lastUpdateControlInput  graphclient.UpdateControlInput

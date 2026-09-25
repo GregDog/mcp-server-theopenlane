@@ -200,6 +200,42 @@ func buildPolicyWhere(in policyListInput) *graphclient.InternalPolicyWhereInput 
 	return &graphclient.InternalPolicyWhereInput{Status: &st}
 }
 
+func buildPlatformWhere(in platformListInput) *graphclient.PlatformWhereInput {
+	var w graphclient.PlatformWhereInput
+	has := false
+	if s := strings.TrimSpace(in.Name); s != "" {
+		w.NameContainsFold = &s
+		has = true
+	}
+	if s := strings.TrimSpace(in.DisplayID); s != "" {
+		w.DisplayIDEqualFold = &s
+		has = true
+	}
+	if s := strings.TrimSpace(in.Status); s != "" {
+		st := enums.ToPlatformStatus(s)
+		if st != nil && *st != enums.PlatformStatusInvalid {
+			w.Status = st
+			has = true
+		}
+	}
+	if s := strings.TrimSpace(in.Environment); s != "" {
+		w.EnvironmentNameEqualFold = &s
+		has = true
+	}
+	if s := strings.TrimSpace(in.Region); s != "" {
+		w.RegionContainsFold = &s
+		has = true
+	}
+	if s := strings.TrimSpace(in.Criticality); s != "" {
+		w.CriticalityNameEqualFold = &s
+		has = true
+	}
+	if !has {
+		return nil
+	}
+	return &w
+}
+
 func buildEvidenceWhere(in evidenceListInput) *graphclient.EvidenceWhereInput {
 	var w graphclient.EvidenceWhereInput
 	has := false
