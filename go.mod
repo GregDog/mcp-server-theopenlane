@@ -4,7 +4,7 @@ go 1.27.0
 
 require (
 	github.com/99designs/gqlgen v0.17.95
-	github.com/modelcontextprotocol/go-sdk v1.7.0
+	github.com/modelcontextprotocol/go-sdk v1.8.0
 	github.com/theopenlane/core/common v1.1.0
 	github.com/theopenlane/go-client v0.14.1
 )
