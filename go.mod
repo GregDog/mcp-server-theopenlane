@@ -28,7 +28,7 @@ require (
 	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/gqlgo/gqlgenc v0.38.2 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.30.0 // indirect
-	github.com/labstack/echo/v5 v5.3.1 // indirect
+	github.com/labstack/echo/v5 v5.4.1 // indirect
 	github.com/mattn/go-colorable v0.1.15 // indirect
 	github.com/mattn/go-isatty v0.0.24 // indirect
 	github.com/oklog/ulid/v2 v2.1.2 // indirect
